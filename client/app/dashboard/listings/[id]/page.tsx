@@ -81,8 +81,9 @@ export default function ListingDetailPage() {
   const [renting,  setRenting]  = useState(false);
 
   // ── Rental form state ──────────────────────────────────────────────────────
-  const [phone,    setPhone]    = useState("");
-  const [duration, setDuration] = useState("7");   // days
+  const [phone,      setPhone]      = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [duration,   setDuration]   = useState("7");   // days
 
   useEffect(() => {
     if (!isConnected) router.push("/");
@@ -190,9 +191,17 @@ export default function ListingDetailPage() {
 
   const handleStartRental = async () => {
     if (!walletAddress) return;
-    if (!phone.trim()) return addToast({ type: "error", message: "Please enter your phone number for coordination." });
+    if (!phone.trim()) {
+      setPhoneError("Phone number is required.");
+      return addToast({ type: "error", message: "Please enter your phone number." });
+    }
+    if (!/^\d{10}$/.test(phone.trim())) {
+      setPhoneError("Phone must be exactly 10 digits (numbers only).");
+      return addToast({ type: "error", message: "Phone must be exactly 10 digits." });
+    }
     if (!onChainId) return addToast({ type: "error", message: "This listing has not been confirmed on-chain yet." });
 
+    setPhoneError(null);
     setRenting(true);
     const tid = addToast({ type: "loading", message: "Starting rental…" });
     try {
@@ -220,6 +229,21 @@ export default function ListingDetailPage() {
         { value: depositWei, gasLimit: BigInt(400_000) },
       );
       await tx.wait();
+
+      // ── Mark listing as on hold in MongoDB (no double-booking) ──────────────────────
+      // Find the MongoDB document ID for this listing to PATCH it
+      const mongoId = listing.id && !/^\d+$/.test(listing.id) ? listing.id : null;
+      if (mongoId) {
+        try {
+          await fetch(`/api/listings/${mongoId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ isActive: false }),
+          });
+        } catch {
+          // Non-fatal — on-chain state is the source of truth
+        }
+      }
 
 
       useAppStore.getState().removeToast(tid);
@@ -364,12 +388,18 @@ export default function ListingDetailPage() {
                 </label>
                 <input
                   type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className={inputCls}
-                  placeholder="+91 98765 43210"
+                  onChange={(e) => { setPhone(e.target.value); setPhoneError(null); }}
+                  className={`${inputCls}${phoneError ? " border-red-500/60" : ""}`}
+                  placeholder="9876543210"
                 />
-                <p className="text-[11px] text-white/25">Shared with owner for pickup coordination</p>
+                {phoneError ? (
+                  <p className="text-[11px] text-red-400">{phoneError}</p>
+                ) : (
+                  <p className="text-[11px] text-white/25">10-digit number · shared with owner for coordination</p>
+                )}
               </div>
             </div>
           )}

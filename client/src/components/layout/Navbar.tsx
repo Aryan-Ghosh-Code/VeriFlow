@@ -18,7 +18,6 @@ import {
   PackageCheck,
   Activity,
   Github,
-  Bell,
   Menu,
   X,
   ShieldCheck,
@@ -113,15 +112,6 @@ export function Navbar() {
             </a>
 
             <ThemeToggle compact />
-
-            {/* Notification bell */}
-            {isConnected && (
-              <button className="relative w-8 h-8 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] flex items-center justify-center text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200">
-                <Bell className="w-4 h-4" />
-                {/* Unread dot */}
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 ring-1 ring-[var(--bg)]" />
-              </button>
-            )}
 
             {/* Trust Tier badge */}
             {isConnected && (
