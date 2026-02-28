@@ -153,3 +153,31 @@ Protocol earns fees from escrow transactions:
 1% rental fee
 
 Sustainable infrastructure model.
+
+
+## 🔄 Workflow Process
+
+```mermaid
+flowchart TD
+    A[User connects wallet] 
+    B[Owner lists asset]
+    C[Protocol calculates dynamic collateral]
+    D[Renter locks collateral]
+    E[Rental completes OR dispute occurs]
+    F[Collateral refunded or penalized]
+    G[Trust score updated]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    
+    style A fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
+    style B fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
+    style C fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
+    style D fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
+    style E fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
+    style F fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
+    style G fill:#4a5568,stroke:#718096,stroke-width:2px,color:#fff
