@@ -171,3 +171,4 @@ flowchart LR
     style Blockchain fill:#2d3748,stroke:#4a5568,stroke-width:2px
     style Database fill:#2d3748,stroke:#4a5568,stroke-width:2px
     style User fill:#1a202c,stroke:#4a5568,stroke-width:2px
+
