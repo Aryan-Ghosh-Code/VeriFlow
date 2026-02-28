@@ -41,7 +41,7 @@ export function useListings() {
    * Returns a temporary local ID so the caller can replace it after the API responds.
    */
   const optimisticAdd = useCallback(
-    (data: { assetName: string; description: string; assetValue: string; owner: string; imageUrl?: string; category?: string }) => {
+    (data: { assetName: string; description: string; assetValue: string; owner: string; imageUrl?: string; category?: string; location?: string }) => {
       const listing: Listing = {
         id:          genLocalId(),
         owner:       data.owner,
@@ -49,6 +49,7 @@ export function useListings() {
         description: data.description,
         assetValue:  data.assetValue,
         imageUrl:    data.imageUrl,
+        location:    data.location,
         isActive:    true,
         createdAt:   Math.floor(Date.now() / 1000),
       };
@@ -72,6 +73,7 @@ export function useListings() {
       imageUrl?: string;
       category?: string;
       chainId?: string;
+      location?: string;
     }): Promise<Listing> => {
       const res = await fetch("/api/listings", {
         method:  "POST",

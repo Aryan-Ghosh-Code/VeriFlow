@@ -382,6 +382,12 @@ export default function DashboardPage() {
                 badge={activeCount > 0 ? activeCount.toString() : undefined}
               />
               <QuickActionCard
+                href="/dashboard/my-listings"
+                icon={<PackageSearch className="w-5 h-5" />}
+                title="Owner Portal"
+                desc="See who rented your items & manage them"
+              />
+              <QuickActionCard
                 href="/dashboard/trust"
                 icon={<ShieldCheck className="w-5 h-5" />}
                 title="Trust Profile"

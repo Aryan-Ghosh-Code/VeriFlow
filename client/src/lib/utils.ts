@@ -8,25 +8,73 @@ import {
   TRUST_TIERS,
   TRUST_SCORE_MIN,
   TRUST_SCORE_MAX,
+  ETH_TO_INR,
 } from "@/config";
 import type { TrustTier, TrustTierName } from "@/types/rental";
 
 // ─── Deposit Calculator ───────────────────────────────────────────────────────
 
 /**
- * Deposit = AssetValue × (1 − TrustScore / 100)
- * Platform fee = 1% of deposit
+ * Mirrors `calculateDeposit` in CollateralX.sol exactly.
+ *
+ *   effScore        = min(trustScore, 85)                    // score above 85 gives no benefit
+ *   diff            = 85 − effScore                          // distance from gold cap
+ *   depositPercent  = 30 + (7075 × diff²) / 722500          // quadratic curve, 30% floor
+ *   base            = assetValueEth × depositPercent / 100
+ *   surcharge       = +1% per week of duration, capped at +10%
+ *   deposit         = base + surcharge
+ *
+ *   platformFee     = deposit × renterFeeBP (1%)             // deducted at completeRental, not upfront
+ *   refundable      = deposit − platformFee                   // returned after clean completion
+ *
+ * Score curve (matches on-chain table):
+ *   score 10  → ~81%  |  score 50  → ~42%  |  score 85+ → 30%
  */
-export function calcDeposit(assetValueEth: number, trustScore: number): {
-  deposit: number;
-  platformFee: number;
-  refundable: number;
-} {
-  const clamped = Math.max(TRUST_SCORE_MIN, Math.min(TRUST_SCORE_MAX, trustScore));
-  const deposit  = assetValueEth * (1 - clamped / 100);
+export function calcDeposit(
+  assetValueEth: number,
+  trustScore: number,
+  durationSecs = 0,   // 0 = no surcharge (listing-card summary mode)
+): { deposit: number; platformFee: number; refundable: number } {
+  // Clamp to valid range, then cap at 85 (matches EFFECTIVE_SCORE_CAP constant)
+  const clamped  = Math.max(TRUST_SCORE_MIN, Math.min(TRUST_SCORE_MAX, trustScore));
+  const effScore = Math.min(clamped, 85);
+
+  // ── Exact Solidity formula ────────────────────────────────────────────────
+  //   uint256 diff = 85 - effScore;
+  //   uint256 pct  = 30 + (7075 * diff * diff) / 722500;
+  const diff = 85 - effScore;
+  const pct  = 30 + (7075 * diff * diff) / 722500;   // naturally ≥ 30
+
+  const base = assetValueEth * (pct / 100);
+
+  // Duration surcharge: +1% per week, capped at 10% (mirrors Solidity)
+  //   uint256 weeks_ = _duration / 1 weeks;
+  //   surcharge = min(base * weeks_ / 100,  base * 10 / 100)
+  const weeks_      = Math.floor(durationSecs / (7 * 86400));
+  const surcharge   = base * (Math.min(weeks_, 10) / 100);
+  const deposit     = base + surcharge;
+
+  // renterFeeBP = 100 (1%) — charged at completeRental, shown here for UI preview
   const platformFee = deposit * PLATFORM_FEE_RATE;
   const refundable  = deposit - platformFee;
   return { deposit, platformFee, refundable };
+}
+
+/**
+ * Mirrors the rental-fee calculation in `startRental` in CollateralX.sol.
+ *
+ *   uint256 days_   = _duration / 1 days;
+ *   uint256 finalAmt = listing.rentalFeePerDay * days_;
+ *
+ * @param rentalFeePerDayEth  – `listing.rentalFeePerDay` converted from Wei to ETH
+ * @param durationSecs        – rental duration in seconds
+ */
+export function calcRentalFee(
+  rentalFeePerDayEth: number,
+  durationSecs: number,
+): number {
+  const days = Math.floor(durationSecs / 86400);   // integer division, same as Solidity
+  return rentalFeePerDayEth * days;
 }
 
 /** Format a value in ETH to a human-readable string */
@@ -43,6 +91,38 @@ export function weiToEth(wei: bigint | string): number {
 /** ETH number → Wei BigInt */
 export function ethToWei(eth: number | string): bigint {
   return ethers.parseEther(String(eth));
+}
+
+// ─── INR Conversion ───────────────────────────────────────────────────────────
+
+/**
+ * Convert an ETH amount (number) to INR using the static rate from config.
+ * e.g. 0.5 ETH → 1,25,000
+ */
+export function ethToInr(eth: number): number {
+  return eth * ETH_TO_INR;
+}
+
+/**
+ * Format a number as an Indian Rupee string.
+ * Uses the `en-IN` locale for lakh/crore grouping.
+ * e.g. 250000 → "₹2,50,000"
+ */
+export function formatInr(amount: number, decimals = 0): string {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: decimals,
+    minimumFractionDigits: decimals,
+  }).format(amount);
+}
+
+/**
+ * Convert ETH amount and immediately format as INR string.
+ * Convenience wrapper: ethToInrStr(0.5) → "₹1,25,000"
+ */
+export function ethToInrStr(eth: number, decimals = 0): string {
+  return formatInr(ethToInr(eth), decimals);
 }
 
 // ─── Trust Score ──────────────────────────────────────────────────────────────

@@ -1,6 +1,9 @@
 // =============================================================================
 // CollateralX Protocol – Create Listing Form
 // =============================================================================
+// Asset Value + Rental Fee: user inputs in INR → shows ETH equivalent below.
+// Phone: must be exactly 10 digits.
+// =============================================================================
 
 "use client";
 
@@ -9,43 +12,68 @@ import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useAppStore } from "@/store/useAppStore";
 import { useListings } from "@/hooks/useListings";
-import { getSigner } from "@/lib/ethers";
-import { getContractWrite } from "@/lib/contract";
+import { getSigner, getReadProvider } from "@/lib/ethers";
+import { getContractWrite, getContractRead } from "@/lib/contract";
 import { ethToWei } from "@/lib/utils";
+import { ETH_TO_INR } from "@/config";
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+/** Convert INR amount (number) to ETH string, rounded to 6 decimal places */
+function inrToEth(inr: number): number {
+  return inr / ETH_TO_INR;
+}
+
+function ethDisplay(inr: string): string | null {
+  const n = parseFloat(inr);
+  if (!n || isNaN(n) || n <= 0) return null;
+  const eth = inrToEth(n);
+  return eth < 0.000001 ? "< 0.000001 ETH" : `${eth.toFixed(6)} ETH`;
+}
+
+/** Validate 10-digit numeric phone */
+function isValidPhone(val: string): boolean {
+  return /^\d{10}$/.test(val.trim());
+}
 
 interface FormData {
   assetName: string;
-  assetValue: string;
+  assetValueInr: string;       // ← user types INR
   description: string;
   imageUrl: string;
-  rentalFeePerDay: string;
+  rentalFeePerDayInr: string;  // ← user types INR
   minDuration: string;   // in days
   maxExtension: string;  // in days
   ownerPhone: string;
+  location: string;
 }
 
 const EMPTY: FormData = {
   assetName: "",
-  assetValue: "",
+  assetValueInr: "",
   description: "",
   imageUrl: "",
-  rentalFeePerDay: "",
+  rentalFeePerDayInr: "",
   minDuration: "1",
   maxExtension: "7",
   ownerPhone: "",
+  location: "",
 };
 
 export function CreateListingForm() {
   const [form, setForm]       = useState<FormData>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const { walletAddress, addToast } = useAppStore();
   const { optimisticAdd, saveListing, refetch } = useListings();
 
-  const set = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
+    if (key === "ownerPhone") setPhoneError(null); // clear error on type
+  };
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,11 +83,25 @@ export function CreateListingForm() {
     setForm((prev) => ({ ...prev, imageUrl: url }));
   };
 
+  // Live ETH previews
+  const assetValueEthDisplay   = ethDisplay(form.assetValueInr);
+  const rentalFeeEthDisplay    = ethDisplay(form.rentalFeePerDayInr);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!walletAddress) return addToast({ type: "error", message: "Connect wallet first." });
-    if (!form.assetName || !form.assetValue || !form.rentalFeePerDay)
+    if (!form.assetName || !form.assetValueInr || !form.rentalFeePerDayInr)
       return addToast({ type: "error", message: "Fill all required fields." });
+
+    // Phone validation
+    if (!isValidPhone(form.ownerPhone)) {
+      setPhoneError("Phone must be exactly 10 digits (numbers only).");
+      return addToast({ type: "error", message: "Phone must be exactly 10 digits." });
+    }
+
+    // Convert INR → ETH for on-chain submission
+    const assetValueEth     = inrToEth(parseFloat(form.assetValueInr));
+    const rentalFeePerDayEth = inrToEth(parseFloat(form.rentalFeePerDayInr));
 
     setLoading(true);
     const toastId = addToast({ type: "loading", message: "Creating listing…" });
@@ -68,9 +110,10 @@ export function CreateListingForm() {
     optimisticAdd({
       assetName:   form.assetName,
       description: form.description,
-      assetValue:  form.assetValue,
+      assetValue:  assetValueEth.toString(),
       owner:       walletAddress,
       imageUrl:    form.imageUrl || undefined,
+      location:    form.location || undefined,
     });
 
     try {
@@ -78,8 +121,8 @@ export function CreateListingForm() {
       const signer   = await getSigner();
       const contract = getContractWrite(signer);
 
-      const valueWei      = ethToWei(form.assetValue);
-      const feePerDayWei  = ethToWei(form.rentalFeePerDay);
+      const valueWei      = ethToWei(assetValueEth);
+      const feePerDayWei  = ethToWei(rentalFeePerDayEth);
       const minDurSec     = BigInt(Math.round(Number(form.minDuration) * 86400));
       const maxExtSec     = BigInt(Math.round(Number(form.maxExtension) * 86400));
 
@@ -89,24 +132,40 @@ export function CreateListingForm() {
         minDurSec,
         maxExtSec,
         feePerDayWei,
-        form.ownerPhone,
-        { gasLimit: BigInt(500_000) },   // explicit override – estimation returns too low (~25k) for storage writes
+        form.ownerPhone.trim(),
+        form.location,
+        { gasLimit: BigInt(500_000) },
       );
       await tx.wait();
+
+      // Read the new on-chain listing ID immediately after confirmation
+      let chainId: string | undefined;
+      try {
+        const readProvider = getReadProvider();
+        const readContract = getContractRead(readProvider);
+        const count: bigint = await readContract.listingCount();
+        chainId = count.toString();
+        readProvider.destroy();
+      } catch {
+        // Non-fatal — listing can still be viewed by numeric URL
+      }
 
       // ── Persist metadata to MongoDB ───────────────────────────────────────
       await saveListing({
         owner:       walletAddress,
         assetName:   form.assetName,
         description: form.description,
-        assetValue:  form.assetValue,
+        assetValue:  assetValueEth.toString(),
         imageUrl:    form.imageUrl || undefined,
+        location:    form.location || undefined,
+        chainId,
       });
 
       useAppStore.getState().removeToast(toastId);
       addToast({ type: "success", message: `Listing "${form.assetName}" created!` });
       setForm(EMPTY);
       setPreview(null);
+      setPhoneError(null);
       await refetch();
     } catch (err: unknown) {
       useAppStore.getState().removeToast(toastId);
@@ -152,30 +211,44 @@ export function CreateListingForm() {
             />
           </Field>
 
-          <Field label="Asset Value (ETH) *">
-            <input
-              value={form.assetValue}
-              onChange={set("assetValue")}
-              type="number"
-              step="0.001"
-              min="0.001"
-              required
-              className={inputCls}
-              placeholder="0.5"
-            />
+          {/* Asset Value in INR → shows ETH */}
+          <Field label="Asset Value (₹ INR) *">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/40">₹</span>
+              <input
+                value={form.assetValueInr}
+                onChange={set("assetValueInr")}
+                type="number"
+                step="1"
+                min="1"
+                required
+                className={inputCls + " pl-7 pr-4"}
+                placeholder="1,25,000"
+              />
+            </div>
+            {assetValueEthDisplay && (
+              <p className="text-[11px] text-emerald-400/80 mt-1 pl-1">≈ {assetValueEthDisplay}</p>
+            )}
           </Field>
 
-          <Field label="Rental Fee / Day (ETH) *">
-            <input
-              value={form.rentalFeePerDay}
-              onChange={set("rentalFeePerDay")}
-              type="number"
-              step="0.0001"
-              min="0.0001"
-              required
-              className={inputCls}
-              placeholder="0.01"
-            />
+          {/* Rental Fee in INR → shows ETH */}
+          <Field label="Rental Fee / Day (₹ INR) *">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/40">₹</span>
+              <input
+                value={form.rentalFeePerDayInr}
+                onChange={set("rentalFeePerDayInr")}
+                type="number"
+                step="1"
+                min="1"
+                required
+                className={inputCls + " pl-7 pr-4"}
+                placeholder="2,500"
+              />
+            </div>
+            {rentalFeeEthDisplay && (
+              <p className="text-[11px] text-emerald-400/80 mt-1 pl-1">≈ {rentalFeeEthDisplay}</p>
+            )}
           </Field>
 
           {/* Duration fields side by side */}
@@ -206,14 +279,32 @@ export function CreateListingForm() {
             </Field>
           </div>
 
+          {/* Phone — 10 digits required */}
           <Field label="Your Phone Number *">
             <input
               value={form.ownerPhone}
               onChange={set("ownerPhone")}
               type="tel"
+              inputMode="numeric"
+              maxLength={10}
               required
+              className={`${inputCls} ${phoneError ? "border-red-500/60 focus:border-red-500/80" : ""}`}
+              placeholder="9876543210"
+            />
+            {phoneError ? (
+              <p className="text-[11px] text-red-400 mt-1 pl-1">{phoneError}</p>
+            ) : (
+              <p className="text-[11px] text-white/25 mt-1 pl-1">10-digit number, no spaces or dashes</p>
+            )}
+          </Field>
+
+          {/* Location / pickup address */}
+          <Field label="Pickup / Return Address">
+            <input
+              value={form.location ?? ""}
+              onChange={set("location")}
               className={inputCls}
-              placeholder="+1 555 000 0000"
+              placeholder="e.g. Connaught Place, New Delhi, 110001"
             />
           </Field>
 

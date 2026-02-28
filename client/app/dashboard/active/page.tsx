@@ -49,43 +49,49 @@ export default function ActiveRentalsPage() {
     const provider = getReadProvider();
     try {
       const contract = getContractRead(provider);
-      // rentalCount is a public state variable, not a function
       const count: bigint = await contract.rentalCount();
       const all: ActiveRental[] = [];
 
-      // Rentals are 1-indexed in the contract
       for (let i = 1; i <= Number(count); i++) {
         const raw: RawRental = await contract.rentals(i);
         const addr = walletAddress?.toLowerCase();
-        // Only show rentals where user is the renter
-        // (owner is stored in the Listing, not the Rental struct)
         if (raw.renter.toLowerCase() !== addr) continue;
 
         const collateralEth = weiToEth(raw.collateral);
-        // Platform fee is 1% of collateral (renterFeeBP = 100 bp)
+        const finalAmtEth   = weiToEth(raw.finalAmount);
         const feeEth        = collateralEth * 0.01;
         const refundable    = collateralEth - feeEth;
+
+        // Try to get the listing name from the contract
+        let assetName = `Listing #${raw.listingId.toString()}`;
+        try {
+          const listing = await contract.listings(raw.listingId);
+          if (listing.name) assetName = listing.name;
+        } catch { /* silent – keep fallback name */ }
 
         all.push({
           rentalId:    raw.id.toString(),
           listingId:   raw.listingId.toString(),
-          assetName:   `Listing #${raw.listingId.toString()}`,
+          assetName,
           renter:      raw.renter,
-          owner:       raw.renter, // Listing owner fetched separately if needed
+          owner:       raw.renter,    // listing owner resolved separately
           depositPaid: collateralEth.toString(),
           platformFee: feeEth.toFixed(6),
           refundable:  refundable.toFixed(6),
+          finalAmount: finalAmtEth > 0 ? finalAmtEth.toString() : undefined,
+          finalPaid:   raw.finalPaid,
+          renterPhone: raw.renterPhone,
           status:      STATUS_MAP[raw.status] ?? "Active",
           startedAt:   Number(raw.startTime),
+          endTime:     Number(raw.endTime),
         });
       }
 
       setActiveRentals(all.reverse());
     } catch (e) {
       console.warn("[ActiveRentals] fetchRentals failed:", e);
-      // Keep optimistic data already in store
     } finally {
-      provider.destroy(); // Stop background eth_blockNumber polling
+      provider.destroy();
       setLoading(false);
     }
   }, [walletAddress, setActiveRentals]);

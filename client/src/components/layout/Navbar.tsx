@@ -15,9 +15,9 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   LayoutGrid,
   PackageSearch,
+  PackageCheck,
   Activity,
   Github,
-  Bell,
   Menu,
   X,
   ShieldCheck,
@@ -25,10 +25,11 @@ import {
 } from "lucide-react";
 
 const NAV_LINKS = [
-  { href: "/dashboard",          label: "Overview",      icon: <LayoutGrid className="w-3.5 h-3.5" /> },
-  { href: "/dashboard/listings", label: "Listings",      icon: <PackageSearch className="w-3.5 h-3.5" /> },
-  { href: "/dashboard/active",   label: "My Rentals",    icon: <Activity className="w-3.5 h-3.5" /> },
-  { href: "/dashboard/trust",    label: "Trust",         icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+  { href: "/dashboard",             label: "Overview",     icon: <LayoutGrid    className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/listings",    label: "Listings",     icon: <PackageSearch className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/active",      label: "My Rentals",   icon: <Activity      className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/my-listings", label: "Owner Portal", icon: <PackageCheck  className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/trust",       label: "Trust",        icon: <ShieldCheck   className="w-3.5 h-3.5" /> },
 ];
 
 export function Navbar() {
@@ -111,15 +112,6 @@ export function Navbar() {
             </a>
 
             <ThemeToggle compact />
-
-            {/* Notification bell */}
-            {isConnected && (
-              <button className="relative w-8 h-8 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] flex items-center justify-center text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200">
-                <Bell className="w-4 h-4" />
-                {/* Unread dot */}
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 ring-1 ring-[var(--bg)]" />
-              </button>
-            )}
 
             {/* Trust Tier badge */}
             {isConnected && (

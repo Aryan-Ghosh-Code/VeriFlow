@@ -21,7 +21,7 @@ export const COLLATERAL_X_ABI = [
   // ── Read Functions ─────────────────────────────────────────────────────────
   "function listingCount() view returns (uint256)",
   "function rentalCount() view returns (uint256)",
-  "function listings(uint256 id) view returns (uint256 id, address owner, string name, uint256 assetValue, bool active, uint256 minDuration, uint256 maxExtension, uint256 rentalFeePerDay, string ownerPhone)",
+  "function listings(uint256 id) view returns (uint256 id, address owner, string name, uint256 assetValue, bool active, uint256 minDuration, uint256 maxExtension, uint256 rentalFeePerDay, string ownerPhone, string location)",
   "function rentals(uint256 id) view returns (uint256 id, uint256 listingId, address renter, uint256 collateral, uint256 finalAmount, uint256 startTime, uint256 endTime, uint256 duration, string renterPhone, uint8 status, bool finalPaid)",
   "function calculateDeposit(uint256 _value, uint256 _duration, address _user) view returns (uint256)",
   "function getUserProfile(address user) view returns (tuple(uint256 totalRentals, uint256 trustScore, uint256 disputesAgainst, uint256 disputesRaised, uint256 disputesLost, uint256 severeDisputes, uint256 rentalsAfterLastDispute, uint8 tier))",
@@ -29,7 +29,7 @@ export const COLLATERAL_X_ABI = [
   "function contractBalance() view returns (uint256)",
 
   // ── Write Functions ────────────────────────────────────────────────────────
-  "function createListing(string calldata _name, uint256 _value, uint256 _minDuration, uint256 _maxExtension, uint256 _rentalFeePerDay, string calldata _ownerPhone)",
+  "function createListing(string calldata _name, uint256 _value, uint256 _minDuration, uint256 _maxExtension, uint256 _rentalFeePerDay, string calldata _ownerPhone, string calldata _location)",
   "function startRental(uint256 _listingId, uint256 _duration, string calldata _renterPhone) payable",
   "function extendRental(uint256 _rentalId, uint256 _extra)",
   "function payFinalAmount(uint256 _rentalId) payable",

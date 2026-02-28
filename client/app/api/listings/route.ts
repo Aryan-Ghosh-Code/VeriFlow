@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
       assetValue:  l.assetValue,
       imageUrl:    l.imageUrl ?? null,
       category:    l.category,
+      location:    l.location ?? "",
       isActive:    l.isActive,
       createdAt:   Math.floor(new Date(l.createdAt).getTime() / 1000),
     }));
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { owner, assetName, description, assetValue, imageUrl, category, chainId } = body;
+    const { owner, assetName, description, assetValue, imageUrl, category, chainId, location } = body;
 
     // Basic validation
     if (!owner || !assetName || !assetValue) {
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
       assetValue:  String(assetValue),
       imageUrl:    imageUrl   ?? undefined,
       category:    category   ?? "Other",
+      location:    location?.trim() ?? "",
       isActive:    true,
     });
 
@@ -89,6 +91,7 @@ export async function POST(req: NextRequest) {
         assetValue:  listing.assetValue,
         imageUrl:    listing.imageUrl ?? null,
         category:    listing.category,
+        location:    listing.location ?? "",
         isActive:    listing.isActive,
         createdAt:   Math.floor(listing.createdAt.getTime() / 1000),
       },
