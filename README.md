@@ -122,3 +122,52 @@ Smart contract automatically:
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/hardhat/hardhat-original.svg" width="60" height="60" alt="Hardhat" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/polygon/polygon-original.svg" width="60" height="60" alt="Polygon" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
 </div>
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart LR
+    subgraph User
+        U["👤 User (Borrower / Owner)"]
+    end
+
+    subgraph Frontend["🌐 Frontend Layer"]
+        direction LR
+        NextJS["💻 Next.js UI"]
+        Wallet["🦊 Wallet Connection (MetaMask)"]
+        Ethers["⛓️ Ethers.js / Wagmi"]
+    end
+
+    subgraph Backend["⚙️ Backend Layer"]
+        direction TB
+        Express["🚀 Express API Server"]
+        Auth["🔐 Wallet Auth & JWT"]
+        Logic["🧠 Business Logic"]
+    end
+
+    subgraph Blockchain["🔗 Blockchain Layer"]
+        direction LR
+        SmartContract["📜 Smart Contract Escrow"]
+        Polygon["🔷 Polygon Network"]
+    end
+
+    subgraph Database["💾 Database Layer"]
+        MongoDB["🍃 MongoDB Atlas"]
+    end
+
+    U --> NextJS
+    NextJS --> Wallet
+    Wallet --> Ethers
+    Ethers --> SmartContract
+    SmartContract --> Polygon
+    
+    NextJS --> Express
+    Express --> Auth
+    Express --> Logic
+    Logic --> MongoDB
+
+    style Frontend fill:#2d3748,stroke:#4a5568,stroke-width:2px
+    style Backend fill:#2d3748,stroke:#4a5568,stroke-width:2px
+    style Blockchain fill:#2d3748,stroke:#4a5568,stroke-width:2px
+    style Database fill:#2d3748,stroke:#4a5568,stroke-width:2px
+    style User fill:#1a202c,stroke:#4a5568,stroke-width:2px
