@@ -16,12 +16,15 @@ export interface TrustTier {
 // ─── Listing ─────────────────────────────────────────────────────────────────
 
 export interface Listing {
-  id: string;          // on-chain listing ID (BigInt string)
+  id: string;          // MongoDB document _id (hex)
+  chainId?: string;    // on-chain listing ID (uint256 as string, e.g. "1", "2")
   owner: string;       // wallet address of the lister
   assetName: string;
   description: string;
   assetValue: string;  // in ETH string
   imageUrl?: string;
+  category?: string;
+  location?: string;   // physical pickup/return address
   isActive: boolean;
   createdAt: number;   // UNIX timestamp
 }
@@ -36,11 +39,15 @@ export interface ActiveRental {
   assetName: string;
   renter: string;
   owner: string;
-  depositPaid: string;   // in ETH string
-  platformFee: string;   // in ETH string
-  refundable: string;    // in ETH string
+  depositPaid: string;    // in ETH string
+  platformFee: string;    // in ETH string
+  refundable: string;     // in ETH string
+  finalAmount?: string;   // in ETH — rental fee due at end
+  finalPaid?: boolean;    // whether payFinalAmount has been called
+  renterPhone?: string;   // for coordination display
   status: RentalStatus;
   startedAt: number;
+  endTime?: number;       // UNIX timestamp when rental expires
   completedAt?: number;
   txHash?: string;
 }

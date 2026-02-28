@@ -8,7 +8,7 @@ contract CollateralX {
     uint256 public ownerFeeBP  = 100; // 1% of final payment collected from owner
     uint256 public feePool;           // accumulated fees in contract
 
-    uint256 public minTrustScore = 10;
+    uint256 public minTrustScore = 0;
     uint256 public maxTrustScore = 100;
     uint256 public constant MIN_DEPOSIT_PERCENT = 30;  // SAFE floor: owners always protected
     uint256 public constant MAX_SCORE_CHANGE    = 5;   // tighter cap per rental
@@ -79,6 +79,7 @@ contract CollateralX {
         uint256 maxExtension;     // seconds renter may extend
         uint256 rentalFeePerDay;  // measured in wei
         string ownerPhone;
+        string location;          // physical pickup/return address
     }
 
     struct Rental {
@@ -183,13 +184,15 @@ contract CollateralX {
         return 100 >> halvings;  // 100, 50, 25, 12, 6
     }
 
-    /// @dev Calculate ratio-based penalty reduction
+    /// @dev Calculate ratio-based penalty reduction.
+    /// Formula (per spec): penalty = basePenalty × (disputesLost+1) / (totalRentals+1) × (weight/100)
+    /// Uses disputesLost (confirmed bad outcomes) NOT disputesAgainst (all accusations incl. rejected ones)
     function _getRatioPenalty(uint256 basePenalty, address user) internal view returns (uint256) {
-        uint256 totalDeals = users[user].totalRentals + users[user].disputesAgainst + 1;
-        uint256 badDeals = users[user].disputesAgainst + 1;
-        // penalty = basePenalty × (badDeals / totalDeals) × (disputeWeight / 100)
-        uint256 weight = _getDisputeWeight(user);
-        return (basePenalty * badDeals * weight) / (totalDeals * 100);
+        uint256 totalRentals = users[user].totalRentals + 1;     // +1 avoids div-by-zero for new users
+        uint256 badDeals     = users[user].disputesLost + 1;     // +1 ensures minimum non-zero weight
+        uint256 weight       = _getDisputeWeight(user);
+        // penalty = basePenalty × (disputesLost+1) / (totalRentals+1) × (weight/100)
+        return (basePenalty * badDeals * weight) / (totalRentals * 100);
     }
 
     // ---- listing & pricing ------------------------------------------------
@@ -199,7 +202,8 @@ contract CollateralX {
         uint256 _minDuration,
         uint256 _maxExtension,
         uint256 _rentalFeePerDay,
-        string memory _ownerPhone
+        string memory _ownerPhone,
+        string memory _location
     ) public {
         require(_value > 0, "Invalid value");
         require(_rentalFeePerDay > 0, "Fee required");
@@ -217,7 +221,8 @@ contract CollateralX {
             _minDuration,
             _maxExtension,
             _rentalFeePerDay,
-            _ownerPhone
+            _ownerPhone,
+            _location
         );
 
         emit ListingCreated(listingCount, msg.sender);
@@ -244,39 +249,63 @@ contract CollateralX {
     //   └───────┴──────────┴──────────────────┴─────────────────────┘
     //   * Still BETTER than competitors, but owners are protected
     //
+    
     function calculateDeposit(
-        uint256 _value,
-        uint256 _duration,
-        address _user
-    ) public view returns (uint256) {
-        uint256 score = users[_user].trustScore;
-        if (score == 0) score = 50;
+    uint256 _value,
+    uint256 _duration,
+    address _user
+) public view returns (uint256) {
 
-        // 5+ SEVERE disputes = forced to pay maximum (81%)
-        if (users[_user].severeDisputes >= SEVERE_DISPUTE_THRESHOLD) {
-            score = minTrustScore;
-        }
+    uint256 score = users[_user].trustScore;
 
-        // cap effective score at 85 — beyond this, no deposit reduction
-        uint256 effScore = score > EFFECTIVE_SCORE_CAP ? EFFECTIVE_SCORE_CAP : score;
-
-        // quadratic: (100-effScore)^2 / 100
-        uint256 diff = 100 - effScore;
-        uint256 pct  = (diff * diff) / 100;        // 2.25 … 81
-
-        // enforce minimum deposit percentage (30%)
-        if (pct < MIN_DEPOSIT_PERCENT) pct = MIN_DEPOSIT_PERCENT;
-
-        uint256 base = (_value * pct) / 100;
-
-        // duration surcharge: +1% of base per week, capped at +10%
-        uint256 weeks_ = _duration / 1 weeks;
-        uint256 surcharge = (base * weeks_) / 100;
-        uint256 maxSurcharge = (base * 10) / 100;
-        if (surcharge > maxSurcharge) surcharge = maxSurcharge;
-
-        return base + surcharge;
+    // Default neutral trust if not initialized
+    if (score == 0) {
+        score = 50;
     }
+
+    // Severe dispute override → worst trust
+    if (users[_user].severeDisputes >= SEVERE_DISPUTE_THRESHOLD) {
+        score = 0;
+    }
+
+    // Cap effective score at 85 (no benefit above 85)
+    uint256 effScore = score > 85 ? 85 : score;
+
+    /*
+        depositPercent =
+        max(
+            30 + 70.75 * ((85 - effScore)^2 / 85^2),
+            30
+        )
+
+        Integer-safe version:
+        70.75 → 7075
+        85^2  → 7225
+        So denominator = 7225 * 100 = 722500
+    */
+
+    uint256 diff = 85 - effScore;
+
+    uint256 pct = 30 + (7075 * diff * diff) / 722500;
+
+    // Enforce 30% safety floor explicitly
+    if (pct < 30) {
+        pct = 30;
+    }
+
+    uint256 base = (_value * pct) / 100;
+
+    // Duration surcharge: +1% per week (max 10%)
+    uint256 weeks_ = _duration / 1 weeks;
+    uint256 surcharge = (base * weeks_) / 100;
+    uint256 maxSurcharge = (base * 10) / 100;
+
+    if (surcharge > maxSurcharge) {
+        surcharge = maxSurcharge;
+    }
+
+    return base + surcharge;
+}
 
     // ---- rental lifecycle -------------------------------------------------
     function startRental(

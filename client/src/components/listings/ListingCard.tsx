@@ -6,10 +6,11 @@
 
 import React from "react";
 import Link from "next/link";
+import { MapPin } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { calcDeposit, formatEth } from "@/lib/utils";
+import { calcDeposit, ethToInrStr } from "@/lib/utils";
 import type { Listing } from "@/types/rental";
 
 interface ListingCardProps {
@@ -19,11 +20,16 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, trustScore }: ListingCardProps) {
   const assetValue = parseFloat(listing.assetValue);
-  const base = calcDeposit(assetValue, 50);     // base deposit at 50 score
-  const user = calcDeposit(assetValue, trustScore); // your deposit
+  const user = calcDeposit(assetValue, trustScore); // your deposit at your trust score
 
-  const saving = base.deposit - user.deposit;
-  const savingPct = base.deposit > 0 ? Math.round((saving / base.deposit) * 100) : 0;
+  // INR equivalents
+  const assetValueInr  = ethToInrStr(assetValue);
+  const depositInr     = ethToInrStr(user.deposit);
+
+  // Savings vs a new user (score 50 → 30% floor deposit)
+  const base          = calcDeposit(assetValue, 50);
+  const saving        = base.deposit - user.deposit;
+  const savingPct     = base.deposit > 0 ? Math.round((saving / base.deposit) * 100) : 0;
 
   return (
     <Card hover className="flex flex-col h-full">
@@ -44,10 +50,18 @@ export function ListingCard({ listing, trustScore }: ListingCardProps) {
           <p className="text-xs text-white/40 mt-0.5 line-clamp-2">{listing.description || "No description provided."}</p>
         </div>
 
-        {/* Stats grid */}
+        {/* Location */}
+        {listing.location && (
+          <div className="flex items-start gap-1.5 text-white/40 min-w-0">
+            <MapPin className="w-3 h-3 mt-0.5 shrink-0 text-violet-400/60" />
+            <span className="text-[11px] line-clamp-1">{listing.location}</span>
+          </div>
+        )}
+
+        {/* Stats grid – show INR, not ETH */}
         <div className="grid grid-cols-2 gap-2">
-          <Stat label="Asset Value" value={formatEth(assetValue)} />
-          <Stat label="Your Deposit" value={formatEth(user.deposit)} highlight />
+          <Stat label="Asset Value" value={assetValueInr} />
+          <Stat label="Your Deposit" value={depositInr} highlight />
         </div>
 
         {/* Savings */}
@@ -55,7 +69,7 @@ export function ListingCard({ listing, trustScore }: ListingCardProps) {
           <div className="rounded-xl bg-emerald-500/8 border border-emerald-500/20 px-3 py-2 flex items-center justify-between">
             <span className="text-xs text-emerald-400">You save</span>
             <span className="text-xs font-bold text-emerald-400">
-              {formatEth(saving)} ({savingPct}%)
+              {ethToInrStr(saving)} ({savingPct}%)
             </span>
           </div>
         )}

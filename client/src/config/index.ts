@@ -20,8 +20,8 @@ export const RPC_URL =
 // ─── Trust Engine ────────────────────────────────────────────────────────────
 
 export const TRUST_SCORE_INITIAL = 50;
-export const TRUST_SCORE_MIN = 10;
-export const TRUST_SCORE_MAX = 90;
+export const TRUST_SCORE_MIN = 0;
+export const TRUST_SCORE_MAX = 100;
 export const TRUST_SCORE_GAIN = 10;  // per successful rental
 export const TRUST_SCORE_LOSS = 20;  // per dispute
 
@@ -35,3 +35,12 @@ export const TRUST_TIERS = {
 
 /** Platform fee as a decimal fraction (1 %) */
 export const PLATFORM_FEE_RATE = 0.01;
+
+// ─── Currency ────────────────────────────────────────────────────────────────
+
+/**
+ * Static ETH → INR conversion rate.
+ * Update this value to reflect current market rates.
+ * 1 ETH ≈ ₹2,50,000 (approximate, used for display only)
+ */
+export const ETH_TO_INR = 250_000;

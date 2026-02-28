@@ -21,6 +21,8 @@ export interface IListing extends Document {
   imageUrl?: string;
   /** High-level category for filtering */
   category: "Electronics" | "Photography" | "Computing" | "Transport" | "Other";
+  /** Physical pickup/return address */
+  location?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -66,6 +68,12 @@ const ListingSchema = new Schema<IListing>(
       type: String,
       enum: ["Electronics", "Photography", "Computing", "Transport", "Other"],
       default: "Other",
+    },
+    location: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Location must be ≤ 300 characters"],
+      default: "",
     },
     isActive: {
       type: Boolean,
