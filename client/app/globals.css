@@ -1,10 +1,9 @@
 /* =============================================================================
-   CollateralX Protocol – Global Styles
+   CollateralX Protocol - Global Styles
    ============================================================================= */
 
 @import "tailwindcss";
 
-/* ─── Custom Keyframes ─────────────────────────────────────────────────────── */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -22,45 +21,72 @@
 
 @keyframes glow-pulse {
   0%, 100% { opacity: 0.4; }
-  50%       { opacity: 0.8; }
+  50% { opacity: 0.8; }
 }
 
 @keyframes marquee {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to { transform: translateX(-50%); }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-18px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
 }
 
 @keyframes pulse-slow {
   0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.05); }
+  50% { opacity: 1; transform: scale(1.05); }
 }
 
-/* ─── Custom Utilities ─────────────────────────────────────────────────────── */
-.animate-marquee {
-  animation: marquee 32s linear infinite;
-}
-
-.animate-float {
-  animation: float 10s ease-in-out infinite;
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 8s ease-in-out infinite;
-}
-
+.animate-marquee { animation: marquee 32s linear infinite; }
+.animate-float { animation: float 10s ease-in-out infinite; }
+.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
 .animate-pulse-slower {
   animation: pulse-slow 12s ease-in-out infinite;
   animation-delay: 2s;
 }
 
-/* ─── Base ─────────────────────────────────────────────────────────────────── */
 :root {
+  --bg: #060609;
+  --bg-elevated: rgba(6, 6, 9, 0.86);
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-soft: rgba(255, 255, 255, 0.03);
+  --text-strong: #f4f5f7;
+  --text-muted: rgba(241, 241, 243, 0.68);
+  --text-subtle: rgba(241, 241, 243, 0.48);
+  --border-soft: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --selection-bg: rgba(139, 92, 246, 0.35);
+  --selection-text: #ffffff;
+  --scroll-thumb: rgba(255, 255, 255, 0.14);
+  --scroll-thumb-hover: rgba(255, 255, 255, 0.25);
+  --ambient-a: rgba(139, 92, 246, 0.08);
+  --ambient-b: rgba(99, 102, 241, 0.06);
   color-scheme: dark;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --bg: #f4f6fb;
+  --bg-elevated: rgba(244, 246, 251, 0.95);
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-soft: rgba(255, 255, 255, 0.72);
+  --text-strong: #111827;
+  --text-muted: rgba(17, 24, 39, 0.74);
+  --text-subtle: rgba(17, 24, 39, 0.5);
+  --border-soft: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.2);
+  --selection-bg: rgba(99, 102, 241, 0.2);
+  --selection-text: #111827;
+  --scroll-thumb: rgba(15, 23, 42, 0.2);
+  --scroll-thumb-hover: rgba(15, 23, 42, 0.35);
+  --ambient-a: rgba(79, 70, 229, 0.14);
+  --ambient-b: rgba(14, 116, 144, 0.11);
+  color-scheme: light;
 }
 
 html {
@@ -68,28 +94,25 @@ html {
 }
 
 body {
-  background-color: #060609;
-  color: #f1f1f3;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-strong);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Selection ────────────────────────────────────────────────────────────── */
 ::selection {
-  background-color: rgba(139, 92, 246, 0.35);
-  color: #ffffff;
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
 }
 
-/* ─── Scrollbar ────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.1); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
 
-/* ─── Noise texture overlay ────────────────────────────────────────────────── */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -98,17 +121,83 @@ body::before {
   background-size: 128px 128px;
 }
 
-/* ─── Ambient gradient ─────────────────────────────────────────────────────── */
 body::after {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(139,92,246,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(99,102,241,0.06) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 50% at 20% -10%, var(--ambient-a) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, var(--ambient-b) 0%, transparent 60%);
 }
 
-/* ─── Main content sits above pseudo-elements ─────────────────────────────── */
-#__next, main { position: relative; z-index: 1; }
+#__next,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Generic class remapping for legacy component color classes in light mode */
+html[data-theme="light"] [class*="text-white"] { color: var(--text-strong) !important; }
+html[data-theme="light"] [class*="text-white/80"] { color: rgba(17, 24, 39, 0.88) !important; }
+html[data-theme="light"] [class*="text-white/70"] { color: rgba(17, 24, 39, 0.82) !important; }
+html[data-theme="light"] [class*="text-white/60"] { color: rgba(17, 24, 39, 0.74) !important; }
+html[data-theme="light"] [class*="text-white/50"] { color: rgba(17, 24, 39, 0.66) !important; }
+html[data-theme="light"] [class*="text-white/40"] { color: rgba(17, 24, 39, 0.58) !important; }
+html[data-theme="light"] [class*="text-white/30"] { color: rgba(17, 24, 39, 0.5) !important; }
+html[data-theme="light"] [class*="text-white/25"] { color: rgba(17, 24, 39, 0.42) !important; }
+html[data-theme="light"] [class*="text-white/20"] { color: rgba(17, 24, 39, 0.34) !important; }
+
+html[data-theme="light"] [class*="bg-black"] { background-color: rgba(255, 255, 255, 0.74) !important; }
+html[data-theme="light"] [class*="bg-white/"] { background-color: rgba(15, 23, 42, 0.05) !important; }
+html[data-theme="light"] [class*="border-white/"] { border-color: rgba(15, 23, 42, 0.15) !important; }
+
+/* Landing page: section-specific light mode polish */
+html[data-theme="light"] .hero-trust-preview {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(246, 248, 255, 0.96)) !important;
+  border-color: rgba(79, 70, 229, 0.2) !important;
+  box-shadow: 0 30px 70px -30px rgba(79, 70, 229, 0.4), 0 12px 28px -16px rgba(15, 23, 42, 0.25) !important;
+}
+html[data-theme="light"] .hero-trust-preview-gloss {
+  opacity: 0.2 !important;
+}
+html[data-theme="light"] .hero-trust-label {
+  color: rgba(17, 24, 39, 0.72) !important;
+}
+html[data-theme="light"] .hero-trust-score {
+  background-image: linear-gradient(140deg, #0f172a, #4338ca 58%, #0891b2) !important;
+}
+html[data-theme="light"] .hero-trust-progress-track {
+  background-color: rgba(148, 163, 184, 0.28) !important;
+}
+html[data-theme="light"] .hero-trust-tier-labels {
+  color: rgba(51, 65, 85, 0.7) !important;
+}
+html[data-theme="light"] .hero-trust-deposit-box {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.38) !important;
+}
+html[data-theme="light"] .hero-last-rental-card {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.35) !important;
+  box-shadow: 0 16px 34px -20px rgba(15, 23, 42, 0.38) !important;
+}
+
+html[data-theme="light"] .how-steps-line {
+  background: linear-gradient(to right, transparent, rgba(79, 70, 229, 0.42), transparent) !important;
+}
+html[data-theme="light"] .how-step-number-card {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.97), rgba(241, 245, 255, 0.95)) !important;
+  border-color: rgba(99, 102, 241, 0.28) !important;
+  box-shadow: 0 14px 28px -20px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.1) !important;
+}
+html[data-theme="light"] .how-step-number {
+  background-image: linear-gradient(145deg, #312e81, #4f46e5, #0891b2) !important;
+}
+html[data-theme="light"] .how-step-title {
+  color: #0f172a !important;
+}
+html[data-theme="light"] .how-step-desc {
+  color: rgba(30, 41, 59, 0.72) !important;
+}

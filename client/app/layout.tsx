@@ -7,6 +7,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { ToastContainer } from "@/components/ui/Toast";
 import { ReceiptModal } from "@/components/receipt/ReceiptModal";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "CollateralX Protocol – Programmable Trust for Rental Collateral",
@@ -22,12 +23,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#060609] antialiased">
-        <Navbar />
-        <main className="relative z-10">{children}</main>
-        <ToastContainer />
-        <ReceiptModal />
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen antialiased">
+        <ThemeProvider>
+          <Navbar />
+          <main className="relative z-10">{children}</main>
+          <ToastContainer />
+          <ReceiptModal />
+        </ThemeProvider>
       </body>
     </html>
   );

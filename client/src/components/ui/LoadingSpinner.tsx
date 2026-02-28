@@ -16,11 +16,11 @@ export function LoadingSpinner({ size = "md", label }: LoadingSpinnerProps) {
     <div className="flex flex-col items-center justify-center gap-3">
       <div
         className={[
-          "rounded-full border-2 border-white/10 border-t-violet-500 animate-spin",
+          "rounded-full border-2 border-[var(--border-soft)] border-t-violet-500 animate-spin",
           sizeMap[size],
         ].join(" ")}
       />
-      {label && <p className="text-sm text-white/50">{label}</p>}
+      {label && <p className="text-sm text-[var(--text-muted)]">{label}</p>}
     </div>
   );
 }

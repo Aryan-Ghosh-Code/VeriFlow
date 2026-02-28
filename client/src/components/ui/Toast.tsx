@@ -1,31 +1,27 @@
-// =============================================================================
-// CollateralX Protocol – Toast Notification System
-// =============================================================================
-
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useAppStore } from "@/store/useAppStore";
 
 const icons: Record<string, string> = {
-  success: "✓",
-  error:   "✕",
-  info:    "ℹ",
-  loading: "⟳",
+  success: "OK",
+  error: "!",
+  info: "i",
+  loading: "...",
 };
 
 const colors: Record<string, string> = {
   success: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
-  error:   "border-red-500/40    bg-red-500/10    text-red-300",
-  info:    "border-blue-500/40   bg-blue-500/10   text-blue-300",
+  error: "border-red-500/40 bg-red-500/10 text-red-300",
+  info: "border-blue-500/40 bg-blue-500/10 text-blue-300",
   loading: "border-violet-500/40 bg-violet-500/10 text-violet-300",
 };
 
 const iconBg: Record<string, string> = {
   success: "bg-emerald-500/20 text-emerald-400",
-  error:   "bg-red-500/20     text-red-400",
-  info:    "bg-blue-500/20    text-blue-400",
-  loading: "bg-violet-500/20  text-violet-400",
+  error: "bg-red-500/20 text-red-400",
+  info: "bg-blue-500/20 text-blue-400",
+  loading: "bg-violet-500/20 text-violet-400",
 };
 
 export function ToastContainer() {
@@ -42,7 +38,7 @@ export function ToastContainer() {
           className={[
             "flex items-start gap-3 px-4 py-3 rounded-xl border backdrop-blur-xl",
             "pointer-events-auto w-80 max-w-xs animate-[slideUp_0.3s_ease-out]",
-            "shadow-xl shadow-black/40",
+            "shadow-xl shadow-black/20",
             colors[toast.type],
           ].join(" ")}
         >
@@ -58,9 +54,9 @@ export function ToastContainer() {
           <p className="flex-1 text-sm font-medium leading-snug">{toast.message}</p>
           <button
             onClick={() => removeToast(toast.id)}
-            className="flex-shrink-0 text-white/30 hover:text-white/70 transition-colors ml-1"
+            className="flex-shrink-0 text-[var(--text-subtle)] hover:text-[var(--text-strong)] transition-colors ml-1"
           >
-            ✕
+            x
           </button>
         </div>
       ))}

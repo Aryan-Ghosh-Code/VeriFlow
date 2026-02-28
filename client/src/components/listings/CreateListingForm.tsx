@@ -120,8 +120,8 @@ export function CreateListingForm() {
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-base font-semibold text-white">Create Listing</h2>
-        <p className="text-xs text-white/40 mt-0.5">Add an asset available for rental</p>
+        <h2 className="text-base font-semibold text-[var(--text-strong)]">Create Listing</h2>
+        <p className="text-xs text-[var(--text-subtle)] mt-0.5">Add an asset available for rental</p>
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -239,11 +239,11 @@ export function CreateListingForm() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-medium text-white/50">{label}</label>
+      <label className="text-xs font-medium text-[var(--text-muted)]">{label}</label>
       {children}
     </div>
   );
 }
 
 const inputCls =
-  "w-full rounded-xl bg-white/4 border border-white/8 text-white text-sm px-3.5 py-2.5 placeholder:text-white/20 focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all";
+  "w-full rounded-xl bg-[var(--surface-soft)] border border-[var(--border-soft)] text-[var(--text-strong)] text-sm px-3.5 py-2.5 placeholder:text-[var(--text-subtle)] focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all";

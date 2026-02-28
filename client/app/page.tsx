@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useWallet } from "@/hooks/useWallet";
+import { useTheme } from "@/components/theme/ThemeProvider";
 import { ConnectButton } from "@/components/wallet/ConnectButton";
 import { APP_CONFIG } from "@/config";
 import {
@@ -195,8 +196,8 @@ function Marquee({ events }: { events: string[] }) {
   return (
     <div className="relative overflow-hidden border-y border-white/5 bg-black/20 py-3">
       {/* Left + right fade masks */}
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-[#060609] to-transparent z-10" />
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-[#060609] to-transparent z-10" />
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-[var(--bg)] to-transparent z-10" />
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-[var(--bg)] to-transparent z-10" />
 
       <div className="flex gap-10 animate-marquee whitespace-nowrap w-max">
         {[...display, ...display].map((event, i) => (
@@ -216,6 +217,8 @@ function Marquee({ events }: { events: string[] }) {
 
 export default function LandingPage() {
   const { isConnected } = useWallet();
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === "light";
   const [tickerEvents, setTickerEvents] = useState<string[]>([]);
 
   // Fetch live activity events from MongoDB
@@ -342,10 +345,15 @@ export default function LandingPage() {
             <motion.div
               animate={{ y: [-10, 10, -10] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-20 w-full max-w-md mx-auto aspect-[4/5] rounded-3xl border border-white/10 bg-black/50 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(139,92,246,0.5)] p-8 flex flex-col justify-between overflow-hidden"
+              className={[
+                "hero-trust-preview relative z-20 w-full max-w-md mx-auto aspect-[4/5] rounded-3xl border backdrop-blur-2xl p-8 flex flex-col justify-between overflow-hidden",
+                isLight
+                  ? "border-indigo-400/30 bg-white/90 shadow-[0_30px_80px_-35px_rgba(79,70,229,0.5)]"
+                  : "border-white/10 bg-black/50 shadow-[0_40px_100px_-20px_rgba(139,92,246,0.5)]",
+              ].join(" ")}
             >
               {/* Glass reflection */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent opacity-50 pointer-events-none" />
+              <div className="hero-trust-preview-gloss absolute inset-0 bg-gradient-to-br from-white/8 to-transparent opacity-50 pointer-events-none" />
               {/* Animated gradient border shimmer */}
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-500/0 via-violet-500/0 to-cyan-500/0 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" style={{ padding: "1px" }} />
 
@@ -365,15 +373,15 @@ export default function LandingPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-white/50 mb-1">Your Trust Score</h3>
-                  <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60">
+                  <h3 className={["hero-trust-label text-sm font-medium mb-1", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>Your Trust Score</h3>
+                  <div className={["hero-trust-score text-6xl font-black text-transparent bg-clip-text", isLight ? "bg-gradient-to-br from-slate-900 via-indigo-700 to-cyan-600" : "bg-gradient-to-br from-white to-white/60"].join(" ")}>
                     850
                   </div>
                   <p className="text-xs text-emerald-400 mt-1 font-medium">↑ Top 5% of network</p>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className={["hero-trust-progress-track h-2 w-full rounded-full overflow-hidden", isLight ? "bg-slate-300/60" : "bg-white/5"].join(" ")}>
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: "85%" }}
@@ -381,25 +389,25 @@ export default function LandingPage() {
                       className="h-full bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full"
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] text-white/30">
+                  <div className={["hero-trust-tier-labels flex justify-between text-[10px]", isLight ? "text-slate-500" : "text-white/30"].join(" ")}>
                     <span>Bronze</span><span>Silver</span><span>Gold</span>
                   </div>
                 </div>
               </div>
 
               <div className="relative z-10 space-y-3">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/8 backdrop-blur-md">
+                <div className={["hero-trust-deposit-box p-4 rounded-2xl backdrop-blur-md", isLight ? "bg-white border border-slate-300 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)]" : "bg-white/5 border border-white/8"].join(" ")}>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-white/50">Base Deposit</span>
-                    <span className="text-xs text-white/40 line-through">2.50 ETH</span>
+                    <span className={["text-xs", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>Base Deposit</span>
+                    <span className={["text-xs line-through", isLight ? "text-slate-500" : "text-white/40"].join(" ")}>2.50 ETH</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-violet-300">Your Deposit</span>
-                    <span className="text-lg font-bold text-emerald-400">0.50 ETH</span>
+                    <span className={["text-sm font-semibold", isLight ? "text-indigo-700" : "text-violet-300"].join(" ")}>Your Deposit</span>
+                    <span className={["text-lg font-extrabold", isLight ? "text-emerald-600" : "text-emerald-400"].join(" ")}>0.50 ETH</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-xs text-emerald-400 font-semibold">
-                  <TrendingDown className="w-3.5 h-3.5" />
+                <div className={["flex items-center justify-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5", isLight ? "text-emerald-700 bg-emerald-100/85 border border-emerald-300/70" : "text-emerald-400"].join(" ")}>
+                  <TrendingDown className={["w-3.5 h-3.5", isLight ? "text-emerald-700" : "text-emerald-400"].join(" ")} />
                   You saved 2.00 ETH (80% off)
                 </div>
               </div>
@@ -413,10 +421,13 @@ export default function LandingPage() {
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -bottom-6 -left-8 bg-black/60 border border-white/10 backdrop-blur-xl rounded-2xl px-4 py-3 z-30 shadow-xl"
+              className={[
+                "hero-last-rental-card absolute -bottom-6 -left-8 border backdrop-blur-xl rounded-2xl px-4 py-3 z-30 shadow-xl",
+                isLight ? "bg-white border-slate-300 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.5)]" : "bg-black/60 border-white/10",
+              ].join(" ")}
             >
-              <p className="text-[10px] text-white/40 mb-1">Last Rental</p>
-              <p className="text-xs font-bold text-white">DSLR Camera Kit</p>
+              <p className={["text-[10px] mb-1", isLight ? "text-slate-600" : "text-white/40"].join(" ")}>Last Rental</p>
+              <p className={["text-xs font-bold", isLight ? "text-slate-900" : "text-white"].join(" ")}>DSLR Camera Kit</p>
               <p className="text-[10px] text-emerald-400 mt-0.5">+10 trust · 0.2 ETH unlocked</p>
             </motion.div>
           </motion.div>
@@ -443,7 +454,7 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <div className="hidden md:block absolute top-[45px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
+            <div className={["how-steps-line hidden md:block absolute top-[45px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-transparent to-transparent", isLight ? "via-indigo-500/40" : "via-violet-500/20"].join(" ")} />
 
             {STEPS.map((step, i) => (
               <motion.div
@@ -452,15 +463,20 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.5, delay: i * 0.2 }}
-                className="relative flex flex-col items-center text-center group"
+                className="how-step-item relative flex flex-col items-center text-center group"
               >
-                <div className="w-24 h-24 mb-6 rounded-2xl bg-white/3 border border-white/10 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)] group-hover:scale-110 group-hover:border-violet-500/50 group-hover:bg-violet-500/5 transition-all duration-300 relative z-10">
-                  <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/20">
+                <div className={[
+                  "how-step-number-card w-24 h-24 mb-6 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 relative z-10",
+                  isLight
+                    ? "bg-white/95 border border-indigo-300/60 shadow-[0_14px_28px_-18px_rgba(15,23,42,0.4)] group-hover:border-indigo-500/60"
+                    : "bg-white/3 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] group-hover:border-violet-500/50 group-hover:bg-violet-500/5",
+                ].join(" ")}>
+                  <div className={["how-step-number text-3xl font-black text-transparent bg-clip-text", isLight ? "bg-gradient-to-br from-indigo-900 to-cyan-600" : "bg-gradient-to-br from-white to-white/20"].join(" ")}>
                     0{i + 1}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                <p className="text-sm text-white/50 leading-relaxed max-w-xs">{step.desc}</p>
+                <h3 className={["how-step-title text-xl font-bold mb-3", isLight ? "text-slate-900" : "text-white"].join(" ")}>{step.title}</h3>
+                <p className={["how-step-desc text-sm leading-relaxed max-w-xs", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -815,3 +831,5 @@ function Sparkles(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+

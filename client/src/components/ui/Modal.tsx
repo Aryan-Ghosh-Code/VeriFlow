@@ -1,7 +1,3 @@
-// =============================================================================
-// CollateralX Protocol – Modal UI Component
-// =============================================================================
-
 "use client";
 
 import React, { useEffect, useRef } from "react";
@@ -17,14 +13,12 @@ interface ModalProps {
 export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-lg" }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (isOpen) window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [isOpen, onClose]);
 
-  // Lock body scroll
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
@@ -40,19 +34,19 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-lg" 
     >
       <div
         className={[
-          "w-full rounded-2xl border border-white/10 bg-[#0f0f14] shadow-2xl shadow-black/80",
+          "w-full rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] shadow-2xl shadow-black/35",
           "animate-[scaleIn_0.2s_ease-out]",
           maxWidth,
         ].join(" ")}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/5">
-            <h2 className="text-lg font-semibold text-white">{title}</h2>
+          <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--border-soft)]">
+            <h2 className="text-lg font-semibold text-[var(--text-strong)]">{title}</h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/8 transition-all"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-soft)] transition-all"
             >
-              ✕
+              x
             </button>
           </div>
         )}

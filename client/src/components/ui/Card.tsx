@@ -16,8 +16,8 @@ interface CardProps {
 
 export function Card({ children, className = "", hover = false, glow = false }: CardProps) {
   const baseClasses = [
-    "relative rounded-2xl border border-white/8",
-    "bg-white/3 backdrop-blur-xl flex flex-col w-full",
+    "relative rounded-2xl border border-[var(--border-soft)]",
+    "bg-[var(--surface-soft)] backdrop-blur-xl flex flex-col w-full",
     glow && "shadow-[0_0_30px_rgba(139,92,246,0.08)]",
     className,
   ]
@@ -51,7 +51,7 @@ export function Card({ children, className = "", hover = false, glow = false }: 
 
 export function CardHeader({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={["px-6 pt-6 pb-4 border-b border-white/5", className].join(" ")}>
+    <div className={["px-6 pt-6 pb-4 border-b border-[var(--border-soft)]", className].join(" ")}>
       {children}
     </div>
   );
@@ -67,7 +67,7 @@ export function CardBody({ children, className = "" }: { children: React.ReactNo
 
 export function CardFooter({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={["px-6 pb-6 pt-4 border-t border-white/5", className].join(" ")}>
+    <div className={["px-6 pb-6 pt-4 border-t border-[var(--border-soft)]", className].join(" ")}>
       {children}
     </div>
   );

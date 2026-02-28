@@ -11,6 +11,7 @@ import { useWallet } from "@/hooks/useWallet";
 import { useTrustScore } from "@/hooks/useTrustScore";
 import { WalletBadge } from "@/components/wallet/WalletBadge";
 import { TierBadge } from "@/components/trust/TierBadge";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   LayoutGrid,
   PackageSearch,
@@ -37,7 +38,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#060609]/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-[var(--border-soft)] bg-[var(--bg-elevated)] backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
 
@@ -95,7 +96,7 @@ export function Navbar() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex w-8 h-8 rounded-lg border border-white/8 bg-white/2 items-center justify-center text-white/40 hover:text-white hover:bg-white/8 hover:border-white/15 transition-all duration-200"
+              className="hidden sm:flex w-8 h-8 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] items-center justify-center text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200"
               title="GitHub"
             >
               <Github className="w-4 h-4" />
@@ -104,17 +105,19 @@ export function Navbar() {
             {/* Docs */}
             <a
               href="#"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/8 bg-white/2 text-xs font-medium text-white/40 hover:text-white hover:bg-white/8 hover:border-white/15 transition-all duration-200"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] text-xs font-medium text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200"
             >
               Docs <ExternalLink className="w-3 h-3" />
             </a>
 
+            <ThemeToggle compact />
+
             {/* Notification bell */}
             {isConnected && (
-              <button className="relative w-8 h-8 rounded-lg border border-white/8 bg-white/2 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/8 hover:border-white/15 transition-all duration-200">
+              <button className="relative w-8 h-8 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] flex items-center justify-center text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200">
                 <Bell className="w-4 h-4" />
                 {/* Unread dot */}
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 ring-1 ring-[#060609]" />
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 ring-1 ring-[var(--bg)]" />
               </button>
             )}
 
@@ -128,7 +131,7 @@ export function Navbar() {
             {/* Mobile hamburger */}
             {isConnected && (
               <button
-                className="md:hidden w-8 h-8 rounded-lg border border-white/8 bg-white/2 flex items-center justify-center text-white/50 hover:text-white transition-colors"
+                className="md:hidden w-8 h-8 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-strong)] transition-colors"
                 onClick={() => setMobileOpen((v) => !v)}
               >
                 {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -140,7 +143,10 @@ export function Navbar() {
 
       {/* ── Mobile Nav Drawer ──────────────────────────────────────────────── */}
       {isConnected && mobileOpen && (
-        <div className="md:hidden border-t border-white/5 bg-[#060609]/95 backdrop-blur-xl px-4 py-3 space-y-1">
+        <div className="md:hidden border-t border-[var(--border-soft)] bg-[var(--bg-elevated)] backdrop-blur-xl px-4 py-3 space-y-2">
+          <div className="pb-2">
+            <ThemeToggle />
+          </div>
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href;
             return (
