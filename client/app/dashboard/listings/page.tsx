@@ -4,7 +4,7 @@
 
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@/hooks/useWallet";
 import { useTrustScore } from "@/hooks/useTrustScore";
@@ -19,10 +19,21 @@ export default function ListingsPage() {
   const { walletAddress, isConnected, isCheckingWallet } = useWallet();
   const { trustScore, trustTier } = useTrustScore(walletAddress);
   const { listings, isLoading, refetch } = useListings();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (!isCheckingWallet && !isConnected) router.push("/");
   }, [isCheckingWallet, isConnected, router]);
+
+  const filteredListings = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return listings;
+    return listings.filter(
+      (l) =>
+        l.assetName.toLowerCase().includes(q) ||
+        (l.location ?? "").toLowerCase().includes(q)
+    );
+  }, [listings, searchQuery]);
 
   if (isCheckingWallet || !isConnected) {
     return (
@@ -66,9 +77,42 @@ export default function ListingsPage() {
         </p>
       </div>
 
+      {/* Search bar */}
+      <div className="relative">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 text-base pointer-events-none select-none">
+          🔍
+        </span>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search by asset name or location…"
+          className="w-full pl-11 pr-4 py-3 rounded-2xl border border-white/10 bg-white/5 text-sm text-white placeholder-white/30 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-all"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery("")}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors text-lg"
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* Result count */}
+      {searchQuery && !isLoading && (
+        <p className="text-xs text-white/40 -mt-2">
+          {filteredListings.length === 0
+            ? "No listings match your search."
+            : `${filteredListings.length} listing${filteredListings.length !== 1 ? "s" : ""} found`}
+        </p>
+      )}
+
       {/* Listings grid */}
       <ListingGrid
-        listings={listings}
+        key={String(!!searchQuery)}
+        listings={filteredListings}
         trustScore={trustScore}
         isLoading={isLoading}
       />
