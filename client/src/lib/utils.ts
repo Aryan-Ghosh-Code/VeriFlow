@@ -15,36 +15,66 @@ import type { TrustTier, TrustTierName } from "@/types/rental";
 // ─── Deposit Calculator ───────────────────────────────────────────────────────
 
 /**
- * Quadratic collateral formula — mirrors on-chain `calculateDeposit`.
+ * Mirrors `calculateDeposit` in CollateralX.sol exactly.
  *
- *   effectiveScore  = min(trustScore, 85)          // 85-cap: score above gives no extra benefit
- *   depositPercent  = max(30, (100−eff)² / 100)    // quadratic decay with 30% floor
- *   deposit         = assetValueEth × depositPercent / 100
- *   platformFee     = deposit × 1%                 // renter fee (1 BP of collateral)
- *   refundable      = deposit − platformFee        // returned on clean completion
+ *   effScore        = min(trustScore, 85)                    // score above 85 gives no benefit
+ *   diff            = 85 − effScore                          // distance from gold cap
+ *   depositPercent  = 30 + (7075 × diff²) / 722500          // quadratic curve, 30% floor
+ *   base            = assetValueEth × depositPercent / 100
+ *   surcharge       = +1% per week of duration, capped at +10%
+ *   deposit         = base + surcharge
  *
- * Score curve (₹10,000 asset):
- *   0  → 100%  / 40 → 36%  / 60 → 30%  / 85+ → 30%
+ *   platformFee     = deposit × renterFeeBP (1%)             // deducted at completeRental, not upfront
+ *   refundable      = deposit − platformFee                   // returned after clean completion
+ *
+ * Score curve (matches on-chain table):
+ *   score 10  → ~81%  |  score 50  → ~42%  |  score 85+ → 30%
  */
 export function calcDeposit(
   assetValueEth: number,
   trustScore: number,
-  durationSecs = 0,          // optional: 0 means no surcharge (summary mode)
+  durationSecs = 0,   // 0 = no surcharge (listing-card summary mode)
 ): { deposit: number; platformFee: number; refundable: number } {
+  // Clamp to valid range, then cap at 85 (matches EFFECTIVE_SCORE_CAP constant)
   const clamped  = Math.max(TRUST_SCORE_MIN, Math.min(TRUST_SCORE_MAX, trustScore));
   const effScore = Math.min(clamped, 85);
-  const diff     = 100 - effScore;
-  const pct      = Math.max(30, (diff * diff) / 100);
-  const base     = assetValueEth * (pct / 100);
 
-  // Duration surcharge: +1% per week, capped at +10% (mirrors on-chain logic)
-  const weeks     = Math.floor(durationSecs / (7 * 86400));
-  const surchargePct = Math.min(weeks, 10);         // cap at 10 weeks
-  const deposit   = base * (1 + surchargePct / 100);
+  // ── Exact Solidity formula ────────────────────────────────────────────────
+  //   uint256 diff = 85 - effScore;
+  //   uint256 pct  = 30 + (7075 * diff * diff) / 722500;
+  const diff = 85 - effScore;
+  const pct  = 30 + (7075 * diff * diff) / 722500;   // naturally ≥ 30
 
+  const base = assetValueEth * (pct / 100);
+
+  // Duration surcharge: +1% per week, capped at 10% (mirrors Solidity)
+  //   uint256 weeks_ = _duration / 1 weeks;
+  //   surcharge = min(base * weeks_ / 100,  base * 10 / 100)
+  const weeks_      = Math.floor(durationSecs / (7 * 86400));
+  const surcharge   = base * (Math.min(weeks_, 10) / 100);
+  const deposit     = base + surcharge;
+
+  // renterFeeBP = 100 (1%) — charged at completeRental, shown here for UI preview
   const platformFee = deposit * PLATFORM_FEE_RATE;
   const refundable  = deposit - platformFee;
   return { deposit, platformFee, refundable };
+}
+
+/**
+ * Mirrors the rental-fee calculation in `startRental` in CollateralX.sol.
+ *
+ *   uint256 days_   = _duration / 1 days;
+ *   uint256 finalAmt = listing.rentalFeePerDay * days_;
+ *
+ * @param rentalFeePerDayEth  – `listing.rentalFeePerDay` converted from Wei to ETH
+ * @param durationSecs        – rental duration in seconds
+ */
+export function calcRentalFee(
+  rentalFeePerDayEth: number,
+  durationSecs: number,
+): number {
+  const days = Math.floor(durationSecs / 86400);   // integer division, same as Solidity
+  return rentalFeePerDayEth * days;
 }
 
 /** Format a value in ETH to a human-readable string */

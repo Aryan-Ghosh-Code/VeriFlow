@@ -59,7 +59,7 @@ async function srvToDirectUri(srvUri: string): Promise<string> {
     .join("&");
 
   const directUri = `mongodb://${userInfo}${hosts}${dbPath}?${allParams}`;
-  console.log(`[MongoDB] Resolved SRV → direct URI for ${atlasHost}`);
+  // console.log(`[MongoDB] Resolved SRV → direct URI for ${atlasHost}`);
   return directUri;
 }
 
@@ -108,7 +108,7 @@ export async function connectDB(): Promise<typeof mongoose> {
           family: 4, // Force IPv4 TCP connections
         })
         .then((m) => {
-          console.log("✅ MongoDB connected");
+          // console.log("✅ MongoDB connected");
           return m;
         });
     })().catch((err) => {

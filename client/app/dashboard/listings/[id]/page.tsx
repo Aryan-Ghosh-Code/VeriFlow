@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/Badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { getReadProvider, getSigner } from "@/lib/ethers";
 import { getContractRead, getContractWrite } from "@/lib/contract";
-import { calcDeposit, weiToEth, ethToInrStr, ethToInr, formatInr, genLocalId } from "@/lib/utils";
+import { calcDeposit, calcRentalFee, weiToEth, ethToInrStr, ethToInr, formatInr, genLocalId } from "@/lib/utils";
 import { ethToWei } from "@/lib/utils";
 import { ETH_TO_INR } from "@/config";
 import type { Listing, ActiveRental } from "@/types/rental";
@@ -76,7 +76,7 @@ export default function ListingDetailPage() {
   const { addToast, addRentalOptimistic } = useAppStore();
 
   const [listing,  setListing]  = useState<Listing | null>(null);
-  const [rawOnChain, setRawOnChain] = useState<Pick<RawListing, "ownerPhone" | "location" | "rentalFeePerDay" | "minDuration"> | null>(null);
+  const [rawOnChain, setRawOnChain] = useState<Pick<RawListing, "ownerPhone" | "location" | "rentalFeePerDay" | "minDuration" | "assetValue"> | null>(null);
   const [loading,  setLoading]  = useState(true);
   const [renting,  setRenting]  = useState(false);
 
@@ -117,10 +117,11 @@ export default function ListingDetailPage() {
           if (!raw.active) throw new Error("Listing not active");
 
           setRawOnChain({
-            ownerPhone:     raw.ownerPhone,
-            location:       raw.location,
+            ownerPhone:      raw.ownerPhone,
+            location:        raw.location,
             rentalFeePerDay: raw.rentalFeePerDay,
-            minDuration:    raw.minDuration,
+            minDuration:     raw.minDuration,
+            assetValue:      raw.assetValue,   // bigint Wei — avoids float roundtrip in calculateDeposit call
           });
 
           // If we didn't find it in the store, build from on-chain data
@@ -179,7 +180,7 @@ export default function ListingDetailPage() {
   const feePerDayEth = rawOnChain
     ? weiToEth(rawOnChain.rentalFeePerDay)
     : 0;
-  const totalFeeEth  = feePerDayEth * durationDays;
+  const totalFeeEth  = calcRentalFee(feePerDayEth, durationSecs);  // mirrors startRental: rentalFeePerDay × days
 
   // INR equivalents
   const depositInr    = ethToInrStr(deposit);
@@ -197,15 +198,29 @@ export default function ListingDetailPage() {
     try {
       const signer   = await getSigner();
       const contract = getContractWrite(signer);
-      const depositWei = ethToWei(deposit);
+
+      // ── Get the EXACT deposit Wei from the contract itself ─────────────────
+      // JS floating-point arithmetic in calcDeposit() can differ from the
+      // contract's integer math by a few wei, causing "Wrong deposit" reverts.
+      // Calling calculateDeposit() (a free view call) gives us the exact same
+      // uint256 the contract will check inside startRental().
+      // Use the raw bigint Wei from the chain (stored in rawOnChain.assetValue) to avoid
+      // float-conversion drift.  Fall back to ethToWei(assetValue) for demo listings.
+      const assetValueWei: bigint = rawOnChain?.assetValue ?? ethToWei(parseFloat(listing.assetValue));
+      const depositWei: bigint = await contract.calculateDeposit(
+        assetValueWei,
+        BigInt(durationSecs),
+        walletAddress,
+      );
 
       const tx = await contract.startRental(
-        onChainId,           // ← always the uint256 on-chain listing ID
+        onChainId,
         BigInt(durationSecs),
         phone.trim(),
         { value: depositWei, gasLimit: BigInt(400_000) },
       );
       await tx.wait();
+
 
       useAppStore.getState().removeToast(tid);
       addToast({ type: "success", message: `🎉 Rental started for ${listing.assetName}!` });
