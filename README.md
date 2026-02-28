@@ -171,4 +171,40 @@ flowchart LR
     style Blockchain fill:#2d3748,stroke:#4a5568,stroke-width:2px
     style Database fill:#2d3748,stroke:#4a5568,stroke-width:2px
     style User fill:#1a202c,stroke:#4a5568,stroke-width:2px
+🧠 Core MVP Features
+🔒 Smart Contract Escrow
+Trustless collateral locking
 
+Automatic settlement
+
+No centralized custody
+
+📊 Dynamic Collateral Engine
+Risk‑based collateral calculation
+
+Quadratic trust‑adjusted curve
+
+Prevents gaming
+
+🪪 On‑Chain Reputation System
+Trust score from 0–100
+
+Increases with successful rentals
+
+Decreases with disputes
+
+⚖️ Automated Dispute Penalty Logic
+Proportional collateral penalties
+
+Ratio‑based fairness
+
+Transparent enforcement
+
+💰 Protocol Revenue Model
+Protocol earns fees from escrow transactions:
+
+1% collateral fee
+
+1% rental fee
+
+Sustainable infrastructure model.
