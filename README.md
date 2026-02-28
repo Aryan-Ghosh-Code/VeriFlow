@@ -91,116 +91,61 @@ Smart contract automatically:
 
 ## ⚙️ Technology Stack
 
+## ⚙️ Technology Stack
+
 ### Frontend 🌐
 <div align="center">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="60" height="60" alt="Next.js" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="60" height="60" alt="React" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" width="60" height="60" alt="Tailwind CSS" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
   <br/><br/>
-  <img src="https://img.shields.io/badge/Ethers.js-3776AB?style=for-the-badge&logo=ethereum&logoColor=white" alt="Ethers.js"/>
-  <img src="https://img.shields.io/badge/Wagmi-FF8800?style=for-the-badge&logo=react&logoColor=white" alt="Wagmi"/>
-  <img src="https://img.shields.io/badge/MetaMask-E17726?style=for-the-badge&logo=metamask&logoColor=white" alt="MetaMask"/>
+ 
 </div>
 
 ### Backend ⚙️
 <div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="60" height="60" alt="Node.js" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="60" height="60" alt="Express.js" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
-  <br/><br/>
-  <img src="https://img.shields.io/badge/REST_APIs-000000?style=for-the-badge&logo=api&logoColor=white" alt="REST APIs"/>
-</div>
-
-### Database 💾
-<div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="60" height="60" alt="MongoDB" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongoose/mongoose-original.svg" width="60" height="60" alt="Mongoose" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/solidity/solidity-original.svg" width="60" height="60" alt="Solidity" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
+  <img src="https://img.shields.io/badge/Ethers.js-3776AB?style=for-the-badge&logo=ethereum&logoColor=white" alt="Ethers.js"/>
 </div>
 
 ### Blockchain ⛓️
 <div align="center">
+  <img src="https://img.shields.io/badge/MetaMask-E17726?style=for-the-badge&logo=metamask&logoColor=white" alt="MetaMask"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/solidity/solidity-original.svg" width="60" height="60" alt="Solidity" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/hardhat/hardhat-original.svg" width="60" height="60" alt="Hardhat" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/polygon/polygon-original.svg" width="60" height="60" alt="Polygon" style="filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));"/>
 </div>
 
-## 🏗️ System Architecture
 
-```mermaid
-flowchart LR
-    subgraph User
-        U["👤 User (Borrower / Owner)"]
-    end
 
-    subgraph Frontend["🌐 Frontend Layer"]
-        direction LR
-        NextJS["💻 Next.js UI"]
-        Wallet["🦊 Wallet Connection (MetaMask)"]
-        Ethers["⛓️ Ethers.js / Wagmi"]
-    end
-
-    subgraph Backend["⚙️ Backend Layer"]
-        direction TB
-        Express["🚀 Express API Server"]
-        Auth["🔐 Wallet Auth & JWT"]
-        Logic["🧠 Business Logic"]
-    end
-
-    subgraph Blockchain["🔗 Blockchain Layer"]
-        direction LR
-        SmartContract["📜 Smart Contract Escrow"]
-        Polygon["🔷 Polygon Network"]
-    end
-
-    subgraph Database["💾 Database Layer"]
-        MongoDB["🍃 MongoDB Atlas"]
-    end
-
-    U --> NextJS
-    NextJS --> Wallet
-    Wallet --> Ethers
-    Ethers --> SmartContract
-    SmartContract --> Polygon
-    
-    NextJS --> Express
-    Express --> Auth
-    Express --> Logic
-    Logic --> MongoDB
-
-    style Frontend fill:#2d3748,stroke:#4a5568,stroke-width:2px
-    style Backend fill:#2d3748,stroke:#4a5568,stroke-width:2px
-    style Blockchain fill:#2d3748,stroke:#4a5568,stroke-width:2px
-    style Database fill:#2d3748,stroke:#4a5568,stroke-width:2px
-    style User fill:#1a202c,stroke:#4a5568,stroke-width:2px
 🧠 Core MVP Features
-🔒 Smart Contract Escrow
+**🔒 Smart Contract Escrow**
+
 Trustless collateral locking
 
 Automatic settlement
 
 No centralized custody
 
-📊 Dynamic Collateral Engine
+**📊 Dynamic Collateral Engine**
 Risk‑based collateral calculation
 
 Quadratic trust‑adjusted curve
 
 Prevents gaming
 
-🪪 On‑Chain Reputation System
+**🪪 On‑Chain Reputation System**
 Trust score from 0–100
 
 Increases with successful rentals
 
 Decreases with disputes
 
-⚖️ Automated Dispute Penalty Logic
+**⚖️ Automated Dispute Penalty Logic**
 Proportional collateral penalties
 
 Ratio‑based fairness
 
 Transparent enforcement
 
-💰 Protocol Revenue Model
+**💰 Protocol Revenue Model**
 Protocol earns fees from escrow transactions:
 
 1% collateral fee
