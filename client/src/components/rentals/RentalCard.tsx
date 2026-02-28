@@ -40,7 +40,8 @@ export function RentalCard({ rental, currentWallet, onRefetch }: RentalCardProps
     try {
       const signer   = await getSigner();
       const contract = getContractWrite(signer);
-      const tx = await contract.completeRental(rental.rentalId);
+      // Note: completeRental requires finalPaid=true (payFinalAmount must be called first)
+      const tx = await contract.completeRental(rental.rentalId, { gasLimit: BigInt(300_000) });
       const receipt = await tx.wait();
       useAppStore.getState().removeToast(tid);
       addToast({ type: "success", message: "Rental completed! Deposit refunded." });
@@ -68,7 +69,14 @@ export function RentalCard({ rental, currentWallet, onRefetch }: RentalCardProps
     try {
       const signer   = await getSigner();
       const contract = getContractWrite(signer);
-      const tx = await contract.raiseDispute(rental.rentalId);
+      // raiseDispute(rentalId, severity, evidenceHash)
+      // Severity: 1=Minor, 2=Moderate, 3=Severe
+      const tx = await contract.raiseDispute(
+        rental.rentalId,
+        2,    // Moderate severity by default
+        "",   // evidenceHash (IPFS hash, empty for now)
+        { gasLimit: BigInt(300_000) },
+      );
       await tx.wait();
       useAppStore.getState().removeToast(tid);
       addToast({ type: "success", message: "Dispute raised. Protocol will review." });

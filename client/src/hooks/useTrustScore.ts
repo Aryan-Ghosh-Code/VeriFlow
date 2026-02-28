@@ -22,15 +22,21 @@ export function useTrustScore(walletAddress: string | null) {
       return;
     }
     setIsLoading(true);
+    const provider = getReadProvider();
     try {
-      const provider = getReadProvider();
       const contract = getContractRead(provider);
-      const raw: bigint = await contract.getTrustScore(walletAddress);
+      const profile = await contract.getUserProfile(walletAddress);
+      // profile is a struct; trustScore is the second field
+      const raw: bigint = profile.trustScore ?? profile[1] ?? BigInt(TRUST_SCORE_INITIAL);
       setTrustScore(Number(raw));
     } catch {
       // Contract not deployed or network issue – use initial score
       setTrustScore(TRUST_SCORE_INITIAL);
     } finally {
+      // ⚠️ IMPORTANT: destroy the provider to stop its background blockNumber
+      // polling loop. Without this, every mounted useTrustScore instance adds
+      // a persistent poller that fires unrecognised eth_call selectors.
+      provider.destroy();
       setIsLoading(false);
     }
   }, [walletAddress, setTrustScore]);

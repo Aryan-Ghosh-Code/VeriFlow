@@ -23,11 +23,13 @@ import type { Listing, ActiveRental } from "@/types/rental";
 interface RawListing {
   id: bigint;
   owner: string;
-  assetName: string;
-  description: string;
+  name: string;        // Solidity field is 'name', not 'assetName'
   assetValue: bigint;
-  isActive: boolean;
-  createdAt: bigint;
+  active: boolean;     // Solidity field is 'active', not 'isActive'
+  minDuration: bigint;
+  maxExtension: bigint;
+  rentalFeePerDay: bigint;
+  ownerPhone: string;
 }
 
 // Demo listings for when contract is not deployed
@@ -92,19 +94,25 @@ export default function ListingDetailPage() {
           return;
         }
 
-        // Try contract
+        // Try contract — listings() is the public mapping accessor
         const provider = getReadProvider();
-        const contract = getContractRead(provider);
-        const raw: RawListing = await contract.getListing(params.id);
-        setListing({
-          id: raw.id.toString(),
-          owner: raw.owner,
-          assetName: raw.assetName,
-          description: raw.description,
-          assetValue: weiToEth(raw.assetValue).toString(),
-          isActive: raw.isActive,
-          createdAt: Number(raw.createdAt),
-        });
+        try {
+          const contract = getContractRead(provider);
+          // params.id is the on-chain listingId (1-indexed)
+          const raw: RawListing = await contract.listings(params.id);
+          if (!raw.active) throw new Error("Listing not active");
+          setListing({
+            id: raw.id.toString(),
+            owner: raw.owner,
+            assetName: raw.name,
+            description: "",   // description is off-chain (MongoDB only)
+            assetValue: weiToEth(raw.assetValue).toString(),
+            isActive: raw.active,
+            createdAt: 0,
+          });
+        } finally {
+          provider.destroy(); // Stop background polling
+        }
       } catch {
         // Fall back to demo listings
         const demo = DEMO_LISTINGS.find((l) => l.id === params.id);
@@ -156,7 +164,15 @@ export default function ListingDetailPage() {
       const contract = getContractWrite(signer);
 
       const depositWei = ethToWei(deposit);
-      const tx = await contract.startRental(listing.id, { value: depositWei });
+      // startRental(listingId, duration, renterPhone)
+      // Default to 7-day rental (604800 seconds)
+      const DEFAULT_DURATION = BigInt(7 * 24 * 60 * 60);  // 7 days in seconds
+      const tx = await contract.startRental(
+        listing.id,
+        DEFAULT_DURATION,
+        "",   // renterPhone — empty for now
+        { value: depositWei, gasLimit: BigInt(400_000) },
+      );
       await tx.wait();
 
       useAppStore.getState().removeToast(tid);

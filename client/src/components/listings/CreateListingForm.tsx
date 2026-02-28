@@ -18,9 +18,22 @@ interface FormData {
   assetValue: string;
   description: string;
   imageUrl: string;
+  rentalFeePerDay: string;
+  minDuration: string;   // in days
+  maxExtension: string;  // in days
+  ownerPhone: string;
 }
 
-const EMPTY: FormData = { assetName: "", assetValue: "", description: "", imageUrl: "" };
+const EMPTY: FormData = {
+  assetName: "",
+  assetValue: "",
+  description: "",
+  imageUrl: "",
+  rentalFeePerDay: "",
+  minDuration: "1",
+  maxExtension: "7",
+  ownerPhone: "",
+};
 
 export function CreateListingForm() {
   const [form, setForm]       = useState<FormData>(EMPTY);
@@ -29,7 +42,7 @@ export function CreateListingForm() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const { walletAddress, addToast } = useAppStore();
-  const { optimisticAdd, refetch }  = useListings();
+  const { optimisticAdd, saveListing, refetch } = useListings();
 
   const set = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -45,12 +58,13 @@ export function CreateListingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!walletAddress) return addToast({ type: "error", message: "Connect wallet first." });
-    if (!form.assetName || !form.assetValue) return addToast({ type: "error", message: "Fill required fields." });
+    if (!form.assetName || !form.assetValue || !form.rentalFeePerDay)
+      return addToast({ type: "error", message: "Fill all required fields." });
 
     setLoading(true);
     const toastId = addToast({ type: "loading", message: "Creating listing…" });
 
-    // Optimistic update
+    // Optimistic UI update (MongoDB metadata)
     optimisticAdd({
       assetName:   form.assetName,
       description: form.description,
@@ -60,11 +74,35 @@ export function CreateListingForm() {
     });
 
     try {
+      // ── On-chain transaction ──────────────────────────────────────────────
       const signer   = await getSigner();
       const contract = getContractWrite(signer);
-      const valueWei = ethToWei(form.assetValue);
-      const tx = await contract.createListing(form.assetName, form.description, valueWei);
+
+      const valueWei      = ethToWei(form.assetValue);
+      const feePerDayWei  = ethToWei(form.rentalFeePerDay);
+      const minDurSec     = BigInt(Math.round(Number(form.minDuration) * 86400));
+      const maxExtSec     = BigInt(Math.round(Number(form.maxExtension) * 86400));
+
+      const tx = await contract.createListing(
+        form.assetName,
+        valueWei,
+        minDurSec,
+        maxExtSec,
+        feePerDayWei,
+        form.ownerPhone,
+        { gasLimit: BigInt(500_000) },   // explicit override – estimation returns too low (~25k) for storage writes
+      );
       await tx.wait();
+
+      // ── Persist metadata to MongoDB ───────────────────────────────────────
+      await saveListing({
+        owner:       walletAddress,
+        assetName:   form.assetName,
+        description: form.description,
+        assetValue:  form.assetValue,
+        imageUrl:    form.imageUrl || undefined,
+      });
+
       useAppStore.getState().removeToast(toastId);
       addToast({ type: "success", message: `Listing "${form.assetName}" created!` });
       setForm(EMPTY);
@@ -87,7 +125,7 @@ export function CreateListingForm() {
       </CardHeader>
       <CardBody>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Image preview */}
+          {/* Image upload */}
           <div
             onClick={() => fileRef.current?.click()}
             className="relative h-32 rounded-xl border border-dashed border-white/10 bg-white/2 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all overflow-hidden flex items-center justify-center"
@@ -104,7 +142,7 @@ export function CreateListingForm() {
           </div>
           <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
 
-          <Field label="Asset Name *" placeholder="e.g. DJI Drone Pro">
+          <Field label="Asset Name *">
             <input
               value={form.assetName}
               onChange={set("assetName")}
@@ -114,20 +152,72 @@ export function CreateListingForm() {
             />
           </Field>
 
-          <Field label="Asset Value (ETH) *" placeholder="">
+          <Field label="Asset Value (ETH) *">
             <input
               value={form.assetValue}
               onChange={set("assetValue")}
               type="number"
               step="0.001"
-              min="0"
+              min="0.001"
               required
               className={inputCls}
               placeholder="0.5"
             />
           </Field>
 
-          <Field label="Description" placeholder="">
+          <Field label="Rental Fee / Day (ETH) *">
+            <input
+              value={form.rentalFeePerDay}
+              onChange={set("rentalFeePerDay")}
+              type="number"
+              step="0.0001"
+              min="0.0001"
+              required
+              className={inputCls}
+              placeholder="0.01"
+            />
+          </Field>
+
+          {/* Duration fields side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Min Duration (days) *">
+              <input
+                value={form.minDuration}
+                onChange={set("minDuration")}
+                type="number"
+                min="1"
+                step="1"
+                required
+                className={inputCls}
+                placeholder="1"
+              />
+            </Field>
+            <Field label="Max Extension (days) *">
+              <input
+                value={form.maxExtension}
+                onChange={set("maxExtension")}
+                type="number"
+                min="0"
+                step="1"
+                required
+                className={inputCls}
+                placeholder="7"
+              />
+            </Field>
+          </div>
+
+          <Field label="Your Phone Number *">
+            <input
+              value={form.ownerPhone}
+              onChange={set("ownerPhone")}
+              type="tel"
+              required
+              className={inputCls}
+              placeholder="+1 555 000 0000"
+            />
+          </Field>
+
+          <Field label="Description (off-chain)">
             <textarea
               value={form.description}
               onChange={set("description")}
@@ -146,7 +236,7 @@ export function CreateListingForm() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode; placeholder?: string }) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-medium text-white/50">{label}</label>

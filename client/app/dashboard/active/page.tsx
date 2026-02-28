@@ -26,11 +26,14 @@ interface RawRental {
   id: bigint;
   listingId: bigint;
   renter: string;
-  owner: string;
-  depositPaid: bigint;
-  platformFee: bigint;
+  collateral: bigint;   // was depositPaid in old contract
+  finalAmount: bigint;
+  startTime: bigint;    // was startedAt in old contract
+  endTime: bigint;
+  duration: bigint;
+  renterPhone: string;
   status: number;
-  startedAt: bigint;
+  finalPaid: boolean;
 }
 
 export default function ActiveRentalsPage() {
@@ -43,43 +46,46 @@ export default function ActiveRentalsPage() {
 
   const fetchRentals = useCallback(async () => {
     setLoading(true);
+    const provider = getReadProvider();
     try {
-      const provider = getReadProvider();
       const contract = getContractRead(provider);
-      const count: bigint = await contract.getRentalCount();
+      // rentalCount is a public state variable, not a function
+      const count: bigint = await contract.rentalCount();
       const all: ActiveRental[] = [];
 
-      for (let i = 0; i < Number(count); i++) {
-        const raw: RawRental = await contract.getRental(i);
+      // Rentals are 1-indexed in the contract
+      for (let i = 1; i <= Number(count); i++) {
+        const raw: RawRental = await contract.rentals(i);
         const addr = walletAddress?.toLowerCase();
-        // Only show rentals where user is renter or owner
-        if (
-          raw.renter.toLowerCase() !== addr &&
-          raw.owner.toLowerCase()  !== addr
-        ) continue;
+        // Only show rentals where user is the renter
+        // (owner is stored in the Listing, not the Rental struct)
+        if (raw.renter.toLowerCase() !== addr) continue;
 
-        const depositEth  = weiToEth(raw.depositPaid);
-        const feeEth      = weiToEth(raw.platformFee);
-        const refundable  = depositEth - feeEth;
+        const collateralEth = weiToEth(raw.collateral);
+        // Platform fee is 1% of collateral (renterFeeBP = 100 bp)
+        const feeEth        = collateralEth * 0.01;
+        const refundable    = collateralEth - feeEth;
 
         all.push({
           rentalId:    raw.id.toString(),
           listingId:   raw.listingId.toString(),
           assetName:   `Listing #${raw.listingId.toString()}`,
           renter:      raw.renter,
-          owner:       raw.owner,
-          depositPaid: depositEth.toString(),
-          platformFee: feeEth.toString(),
-          refundable:  refundable.toString(),
+          owner:       raw.renter, // Listing owner fetched separately if needed
+          depositPaid: collateralEth.toString(),
+          platformFee: feeEth.toFixed(6),
+          refundable:  refundable.toFixed(6),
           status:      STATUS_MAP[raw.status] ?? "Active",
-          startedAt:   Number(raw.startedAt),
+          startedAt:   Number(raw.startTime),
         });
       }
 
       setActiveRentals(all.reverse());
-    } catch {
+    } catch (e) {
+      console.warn("[ActiveRentals] fetchRentals failed:", e);
       // Keep optimistic data already in store
     } finally {
+      provider.destroy(); // Stop background eth_blockNumber polling
       setLoading(false);
     }
   }, [walletAddress, setActiveRentals]);
