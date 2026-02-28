@@ -15,6 +15,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import {
   LayoutGrid,
   PackageSearch,
+  PackageCheck,
   Activity,
   Github,
   Bell,
@@ -25,10 +26,11 @@ import {
 } from "lucide-react";
 
 const NAV_LINKS = [
-  { href: "/dashboard",          label: "Overview",      icon: <LayoutGrid className="w-3.5 h-3.5" /> },
-  { href: "/dashboard/listings", label: "Listings",      icon: <PackageSearch className="w-3.5 h-3.5" /> },
-  { href: "/dashboard/active",   label: "My Rentals",    icon: <Activity className="w-3.5 h-3.5" /> },
-  { href: "/dashboard/trust",    label: "Trust",         icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+  { href: "/dashboard",             label: "Overview",     icon: <LayoutGrid    className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/listings",    label: "Listings",     icon: <PackageSearch className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/active",      label: "My Rentals",   icon: <Activity      className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/my-listings", label: "Owner Portal", icon: <PackageCheck  className="w-3.5 h-3.5" /> },
+  { href: "/dashboard/trust",       label: "Trust",        icon: <ShieldCheck   className="w-3.5 h-3.5" /> },
 ];
 
 export function Navbar() {

@@ -600,13 +600,15 @@ contract CollateralX {
 
     function completeRental(uint256 _rentalId) public {
         Rental storage r = rentals[_rentalId];
+        Listing storage l = listings[r.listingId];
+        require(msg.sender == l.owner, "Only owner can complete");
         require(r.status == Status.Active, "Not active");
         require(r.finalPaid, "Fee unpaid");
 
         r.status = Status.Completed;
 
         address renter = r.renter;
-        address owner = listings[r.listingId].owner;
+        address owner = l.owner;
         uint256 collateral = r.collateral;
 
         // deduct renter fee and refund remainder
@@ -617,7 +619,7 @@ contract CollateralX {
         // Update renter stats
         users[renter].totalRentals += 1;
         users[renter].rentalsAfterLastDispute += 1;  // redemption tracking
-        _updateTrust(renter, listings[r.listingId].assetValue, r.duration, true);
+        _updateTrust(renter, l.assetValue, r.duration, true);
 
         // Update owner stats
         owners[owner].totalRentalsAsOwner += 1;
