@@ -18,9 +18,9 @@ const variantClass: Record<Variant, string> = {
   primary:
     "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-900/30",
   secondary:
-    "bg-white/5 border border-white/10 hover:bg-white/10 text-white",
+    "bg-[var(--surface-soft)] border border-[var(--border-soft)] hover:bg-[var(--surface)] text-[var(--text-strong)]",
   ghost:
-    "bg-transparent hover:bg-white/5 text-white/70 hover:text-white",
+    "bg-transparent hover:bg-[var(--surface-soft)] text-[var(--text-muted)] hover:text-[var(--text-strong)]",
   danger:
     "bg-red-600/20 border border-red-500/40 hover:bg-red-600/30 text-red-400 hover:text-red-300",
 };
@@ -56,7 +56,7 @@ export function Button({
       ].join(" ")}
     >
       {loading ? (
-        <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+        <span className="h-4 w-4 rounded-full border-2 border-[var(--text-subtle)] border-t-[var(--text-strong)] animate-spin" />
       ) : (
         icon
       )}

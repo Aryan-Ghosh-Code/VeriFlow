@@ -24,12 +24,12 @@ export function WalletBadge() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 transition-all text-sm text-white/80 hover:text-white"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--border-soft)] bg-[var(--surface-soft)] hover:bg-[var(--surface)] transition-all text-sm text-[var(--text-muted)] hover:text-[var(--text-strong)]"
       >
         {/* Green dot */}
         <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
         <span className="font-mono">{shortAddress}</span>
-        <svg className="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3 h-3 text-[var(--text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -38,10 +38,10 @@ export function WalletBadge() {
         <>
           {/* backdrop */}
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 z-30 w-52 rounded-xl border border-white/10 bg-[#0f0f14] shadow-2xl shadow-black/60 overflow-hidden">
-            <div className="px-4 py-3 border-b border-white/5">
-              <p className="text-xs text-white/40 mb-1">Connected Wallet</p>
-              <p className="text-xs font-mono text-white break-all">{walletAddress}</p>
+          <div className="absolute right-0 top-full mt-2 z-30 w-52 rounded-xl border border-[var(--border-soft)] bg-[var(--surface)] shadow-2xl shadow-black/35 overflow-hidden">
+            <div className="px-4 py-3 border-b border-[var(--border-soft)]">
+              <p className="text-xs text-[var(--text-subtle)] mb-1">Connected Wallet</p>
+              <p className="text-xs font-mono text-[var(--text-strong)] break-all">{walletAddress}</p>
             </div>
             <button
               onClick={() => { setOpen(false); disconnect(); }}
