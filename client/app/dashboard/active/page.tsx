@@ -26,15 +26,30 @@ interface RawRental {
   id: bigint;
   listingId: bigint;
   renter: string;
-  collateral: bigint;   // was depositPaid in old contract
+  collateral: bigint;
   finalAmount: bigint;
-  startTime: bigint;    // was startedAt in old contract
+  startTime: bigint;
   endTime: bigint;
   duration: bigint;
   renterPhone: string;
   status: number;
   finalPaid: boolean;
 }
+
+interface RawListing {
+  id: bigint;
+  owner: string;
+  name: string;
+  assetValue: bigint;
+  active: boolean;
+  minDuration: bigint;
+  maxExtension: bigint;
+  rentalFeePerDay: bigint;
+  ownerPhone: string;
+  location: string;
+}
+
+type TabId = "renter" | "owner";
 
 export default function ActiveRentalsPage() {
   const router = useRouter();
@@ -43,6 +58,7 @@ export default function ActiveRentalsPage() {
   const { activeRentals, setActiveRentals } = useAppStore();
 
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabId>("renter");
 
   const fetchRentals = useCallback(async () => {
     setLoading(true);
@@ -51,36 +67,45 @@ export default function ActiveRentalsPage() {
       const contract = getContractRead(provider);
       const count: bigint = await contract.rentalCount();
       const all: ActiveRental[] = [];
+      const addr = walletAddress?.toLowerCase();
 
       for (let i = 1; i <= Number(count); i++) {
         const raw: RawRental = await contract.rentals(i);
-        const addr = walletAddress?.toLowerCase();
-        if (raw.renter.toLowerCase() !== addr) continue;
+
+        const isRenter = raw.renter.toLowerCase() === addr;
+
+        // Resolve listing to get owner + phone
+        let listing: RawListing | null = null;
+        try { listing = await contract.listings(raw.listingId); } catch { /* silent */ }
+
+        const isOwner = listing?.owner?.toLowerCase() === addr;
+
+        // Skip if wallet is not involved in this rental
+        if (!isRenter && !isOwner) continue;
 
         const collateralEth = weiToEth(raw.collateral);
         const finalAmtEth   = weiToEth(raw.finalAmount);
         const feeEth        = collateralEth * 0.01;
         const refundable    = collateralEth - feeEth;
 
-        // Try to get the listing name from the contract
-        let assetName = `Listing #${raw.listingId.toString()}`;
-        try {
-          const listing = await contract.listings(raw.listingId);
-          if (listing.name) assetName = listing.name;
-        } catch { /* silent – keep fallback name */ }
+        const assetName = listing?.name
+          ? listing.name
+          : `Listing #${raw.listingId.toString()}`;
 
         all.push({
           rentalId:    raw.id.toString(),
           listingId:   raw.listingId.toString(),
           assetName,
           renter:      raw.renter,
-          owner:       raw.renter,    // listing owner resolved separately
+          owner:       listing?.owner ?? "",
+          role:        isRenter ? "renter" : "owner",
           depositPaid: collateralEth.toString(),
           platformFee: feeEth.toFixed(6),
           refundable:  refundable.toFixed(6),
           finalAmount: finalAmtEth > 0 ? finalAmtEth.toString() : undefined,
           finalPaid:   raw.finalPaid,
           renterPhone: raw.renterPhone,
+          ownerPhone:  listing?.ownerPhone,
           status:      STATUS_MAP[raw.status] ?? "Active",
           startedAt:   Number(raw.startTime),
           endTime:     Number(raw.endTime),
@@ -96,13 +121,17 @@ export default function ActiveRentalsPage() {
     }
   }, [walletAddress, setActiveRentals]);
 
-  // Redirect guard — wait until wallet check is done
   useEffect(() => {
     if (!isCheckingWallet && !isConnected) { router.push("/"); return; }
     if (isConnected) fetchRentals();
   }, [isCheckingWallet, isConnected, router, fetchRentals]);
 
-  if (isCheckingWallet || !isConnected) return <div className="flex items-center justify-center min-h-[60vh]"><LoadingSpinner /></div>;
+  if (isCheckingWallet || !isConnected)
+    return <div className="flex items-center justify-center min-h-[60vh]"><LoadingSpinner /></div>;
+
+  const renterRentals = activeRentals.filter(r => r.role === "renter");
+  const ownerRentals  = activeRentals.filter(r => r.role === "owner");
+  const displayed     = activeTab === "renter" ? renterRentals : ownerRentals;
 
   return (
     <div className="min-h-[80vh] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -111,7 +140,7 @@ export default function ActiveRentalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">My Rentals</h1>
           <p className="text-sm text-white/40 mt-1">
-            All rentals where you are the renter or owner
+            All rentals you are involved in
           </p>
         </div>
         <div className="flex items-center gap-3 text-sm text-white/40">
@@ -125,39 +154,84 @@ export default function ActiveRentalsPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 rounded-xl border border-white/8 bg-white/3 w-fit">
+        {(["renter", "owner"] as TabId[]).map((tab) => {
+          const count = tab === "renter" ? renterRentals.length : ownerRentals.length;
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={[
+                "relative px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                isActive
+                  ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                  : "text-white/40 hover:text-white/70",
+              ].join(" ")}
+            >
+              {tab === "renter" ? "As Renter" : "As Owner"}
+              {count > 0 && (
+                <span
+                  className={[
+                    "ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-full",
+                    isActive ? "bg-white/20 text-white" : "bg-white/8 text-white/40",
+                  ].join(" ")}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-20">
           <LoadingSpinner label="Loading rentals…" />
         </div>
-      ) : activeRentals.length === 0 ? (
+      ) : displayed.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center space-y-3">
-          <p className="text-6xl">📋</p>
-          <h3 className="text-lg font-semibold text-white/70">No rentals yet</h3>
+          <p className="text-6xl">{activeTab === "renter" ? "📋" : "🏷️"}</p>
+          <h3 className="text-lg font-semibold text-white/70">
+            {activeTab === "renter" ? "No rentals yet" : "No active listings rented out"}
+          </h3>
           <p className="text-sm text-white/30 max-w-xs">
-            Start a rental from the listings page to see it here.
+            {activeTab === "renter"
+              ? "Start a rental from the listings page to see it here."
+              : "When someone rents one of your listings, it will appear here."}
           </p>
-          <button
-            onClick={() => router.push("/dashboard/listings")}
-            className="mt-2 text-sm text-violet-400 hover:text-violet-300 underline underline-offset-4 transition-colors"
-          >
-            Browse Listings →
-          </button>
+          {activeTab === "renter" && (
+            <button
+              onClick={() => router.push("/dashboard/listings")}
+              className="mt-2 text-sm text-violet-400 hover:text-violet-300 underline underline-offset-4 transition-colors"
+            >
+              Browse Listings →
+            </button>
+          )}
+          {activeTab === "owner" && (
+            <button
+              onClick={() => router.push("/dashboard/my-listings")}
+              className="mt-2 text-sm text-violet-400 hover:text-violet-300 underline underline-offset-4 transition-colors"
+            >
+              My Listings →
+            </button>
+          )}
         </div>
       ) : (
         <>
           {/* Summary stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <SummaryBox label="Total"     value={activeRentals.length.toString()} />
-            <SummaryBox label="Active"    value={activeRentals.filter(r => r.status === "Active").length.toString()}    color="green" />
-            <SummaryBox label="Completed" value={activeRentals.filter(r => r.status === "Completed").length.toString()} color="violet" />
-            <SummaryBox label="Disputed"  value={activeRentals.filter(r => r.status === "Disputed").length.toString()}  color="red" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <SummaryBox label="Total"     value={displayed.length.toString()} />
+            <SummaryBox label="Active"    value={displayed.filter(r => r.status === "Active").length.toString()}    color="green" />
+            <SummaryBox label="Disputed"  value={displayed.filter(r => r.status === "Disputed").length.toString()}  color="red" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {activeRentals.map((rental) => (
+            {displayed.map((rental) => (
               <RentalCard
-                key={rental.rentalId}
+                key={`${rental.role}-${rental.rentalId}`}
                 rental={rental}
                 currentWallet={walletAddress ?? ""}
                 onRefetch={fetchRentals}

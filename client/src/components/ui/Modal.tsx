@@ -30,11 +30,11 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-lg" 
     <div
       ref={overlayRef}
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-black/60 backdrop-blur-sm"
     >
       <div
         className={[
-          "w-full rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] shadow-2xl shadow-black/35",
+          "w-full my-auto rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] shadow-2xl shadow-black/35",
           "animate-[scaleIn_0.2s_ease-out]",
           maxWidth,
         ].join(" ")}

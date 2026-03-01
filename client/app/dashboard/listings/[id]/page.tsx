@@ -255,6 +255,7 @@ export default function ListingDetailPage() {
         assetName:   listing.assetName,
         renter:      walletAddress,
         owner:       listing.owner,
+        role:        "renter",
         depositPaid: deposit.toString(),
         platformFee: platformFee.toString(),
         refundable:  refundable.toString(),

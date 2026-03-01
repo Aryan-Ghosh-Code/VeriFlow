@@ -17,7 +17,7 @@ contract CollateralX {
 
     // ── DISPUTE SYSTEM CONSTANTS ──────────────────────────────────────────
     uint256 public constant DISPUTE_WINDOW = 48 hours;     // time to raise dispute after rental
-    uint256 public constant RESPONSE_WINDOW = 72 hours;    // time for accused to respond
+    uint256 public constant RESPONSE_WINDOW = 1 minutes;    // time for accused to respond (1 min for demo)
     uint256 public constant REDEMPTION_RENTALS = 3;        // successful rentals to halve dispute weight
 
     // timestamps and durations are stored in seconds

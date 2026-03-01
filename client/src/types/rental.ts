@@ -39,12 +39,14 @@ export interface ActiveRental {
   assetName: string;
   renter: string;
   owner: string;
+  role: "renter" | "owner";  // which side the current wallet is on
   depositPaid: string;    // in ETH string
   platformFee: string;    // in ETH string
   refundable: string;     // in ETH string
   finalAmount?: string;   // in ETH — rental fee due at end
   finalPaid?: boolean;    // whether payFinalAmount has been called
   renterPhone?: string;   // for coordination display
+  ownerPhone?: string;    // listing owner phone (shown to renter)
   status: RentalStatus;
   startedAt: number;
   endTime?: number;       // UNIX timestamp when rental expires
