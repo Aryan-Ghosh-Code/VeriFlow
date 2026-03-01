@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – MongoDB Connection Singleton
+﻿// =============================================================================
+// VeriFlow Protocol – MongoDB Connection Singleton
 // =============================================================================
 // Uses a custom DNS resolver (Google 8.8.8.8) to resolve MongoDB Atlas SRV
 // records, bypassing Windows ISP DNS that refuses querySrv lookups.

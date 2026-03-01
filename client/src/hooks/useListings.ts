@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – useListings Hook
+﻿// =============================================================================
+// VeriFlow Protocol – useListings Hook
 // =============================================================================
 // MongoDB is now the source of truth for listing metadata.
 // Financial data (trust score, deposit, rental status) stays on-chain.

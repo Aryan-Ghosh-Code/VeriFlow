@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Resolve Dispute Modal (Owner / Hackathon flow)
+﻿// =============================================================================
+// VeriFlow Protocol – Resolve Dispute Modal (Owner / Hackathon flow)
 // =============================================================================
 // After a dispute is raised, the accused party has 72h (RESPONSE_WINDOW) to
 // respond on-chain. Once that window expires, resolveDispute() can be called.

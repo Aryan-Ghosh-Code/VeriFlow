@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Zustand Global Store
+﻿// =============================================================================
+// VeriFlow Protocol – Zustand Global Store
 // =============================================================================
 
 "use client";
@@ -156,6 +156,6 @@ export const useAppStore = create<AppState>()(
       reset: () =>
         set({ ...initialState, isCheckingWallet: false }, false, "reset"),
     }),
-    { name: "CollateralX" }
+    { name: "VeriFlow" }
   )
 );

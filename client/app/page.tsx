@@ -1,12 +1,15 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useWallet } from "@/hooks/useWallet";
+import { useTrustScore } from "@/hooks/useTrustScore";
+import { useAppStore } from "@/store/useAppStore";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { ConnectButton } from "@/components/wallet/ConnectButton";
 import { APP_CONFIG } from "@/config";
+import { calcDeposit } from "@/lib/utils";
 import {
   ShieldCheck,
   Cpu,
@@ -76,7 +79,7 @@ const STEPS = [
 
 const TESTIMONIALS = [
   {
-    quote: "CollateralX cut my deposit by 60%. I listed a camera kit and the renter got approved in seconds. This is the future of peer-to-peer rental.",
+    quote: "VeriFlow cut my deposit by 60%. I listed a camera kit and the renter got approved in seconds. This is the future of peer-to-peer rental.",
     name: "Alex K.",
     handle: "@alexk.eth",
     tier: "Gold",
@@ -137,7 +140,7 @@ const TEAM = [
   }
 ];
 
-// Comparison data: traditional vs CollateralX
+// Comparison data: traditional vs VeriFlow
 const COMPARISON = [
   {
     feature: "Deposit Amount",
@@ -216,10 +219,37 @@ function Marquee({ events }: { events: string[] }) {
 // ── Components ───────────────────────────────────────────────────────────
 
 export default function LandingPage() {
-  const { isConnected } = useWallet();
+  const { isConnected, walletAddress } = useWallet();
   const { resolvedTheme } = useTheme();
   const isLight = resolvedTheme === "light";
   const [tickerEvents, setTickerEvents] = useState<string[]>([]);
+
+  // Real-time data — only fetched when connected
+  const { trustScore: liveScore, trustTier: liveTier } = useTrustScore(walletAddress);
+  const { activeRentals } = useAppStore();
+
+  // Hero card values: real when connected, demo fallback when not
+  const DEMO_SCORE    = 85;   // displayed as "85" in the hero (realistic)
+  const DEMO_TIER     = "Gold";
+  const DEMO_ASSET    = 2.5;  // ETH sample asset for deposit calc
+  const DEMO_RENTAL   = "DSLR Camera Kit";
+
+  const heroScore   = isConnected ? liveScore     : DEMO_SCORE;
+  const heroTier    = isConnected ? (liveTier?.name ?? DEMO_TIER) : DEMO_TIER;
+  const lastRental  = isConnected
+    ? (activeRentals[activeRentals.length - 1]?.assetName ?? null)
+    : DEMO_RENTAL;
+
+  // Deposit calc (same curve as contract)
+  const { deposit: heroDeposit } = calcDeposit(DEMO_ASSET, heroScore);
+  const heroSaved   = DEMO_ASSET - heroDeposit;
+  const progressPct = Math.round((heroScore / 100) * 100);
+
+  const tierBadgeClass: Record<string, string> = {
+    Gold:   "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
+    Silver: "bg-zinc-500/10 border-zinc-500/20 text-zinc-300",
+    Bronze: "bg-amber-500/10 border-amber-500/20 text-amber-400",
+  };
 
   // Fetch live activity events from MongoDB
   useEffect(() => {
@@ -280,7 +310,7 @@ export default function LandingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
               </span>
-              CollateralX V1 is Live on Testnet
+              VeriFlow V1 is Live on Testnet
             </motion.div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight text-white">
@@ -291,7 +321,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light">
-              Stop overpaying in locked collateral. CollateralX uses your true on-chain reputation to dynamically lower security deposits by up to{" "}
+              Stop overpaying in locked collateral. VeriFlow uses your true on-chain reputation to dynamically lower security deposits by up to{" "}
               <span className="text-emerald-400 font-semibold">80%</span>.
             </p>
 
@@ -354,37 +384,39 @@ export default function LandingPage() {
             >
               {/* Glass reflection */}
               <div className="hero-trust-preview-gloss absolute inset-0 bg-gradient-to-br from-white/8 to-transparent opacity-50 pointer-events-none" />
-              {/* Animated gradient border shimmer */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-500/0 via-violet-500/0 to-cyan-500/0 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" style={{ padding: "1px" }} />
 
               <div className="space-y-6 relative z-10">
-                {/* "Last rental" chip */}
+                {/* Status badges */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                     </span>
-                    Live Network
+                    {isConnected ? "Live · Connected" : "Live Network"}
                   </div>
-                  <div className="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-bold">
-                    Gold Tier
+                  <div className={`px-3 py-1 rounded-full border text-xs font-bold ${tierBadgeClass[heroTier] ?? tierBadgeClass.Gold}`}>
+                    {heroTier} Tier
                   </div>
                 </div>
 
+                {/* Score */}
                 <div>
                   <h3 className={["hero-trust-label text-sm font-medium mb-1", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>Your Trust Score</h3>
                   <div className={["hero-trust-score text-6xl font-black text-transparent bg-clip-text", isLight ? "bg-gradient-to-br from-slate-900 via-indigo-700 to-cyan-600" : "bg-gradient-to-br from-white to-white/60"].join(" ")}>
-                    850
+                    {heroScore}
                   </div>
-                  <p className="text-xs text-emerald-400 mt-1 font-medium">↑ Top 5% of network</p>
+                  <p className="text-xs text-emerald-400 mt-1 font-medium">
+                    {isConnected ? `↑ Your on-chain score` : "↑ Top 5% of network"}
+                  </p>
                 </div>
 
+                {/* Progress bar */}
                 <div className="space-y-3">
                   <div className={["hero-trust-progress-track h-2 w-full rounded-full overflow-hidden", isLight ? "bg-slate-300/60" : "bg-white/5"].join(" ")}>
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: "85%" }}
+                      animate={{ width: `${progressPct}%` }}
                       transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
                       className="h-full bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full"
                     />
@@ -395,20 +427,21 @@ export default function LandingPage() {
                 </div>
               </div>
 
+              {/* Deposit preview */}
               <div className="relative z-10 space-y-3">
                 <div className={["hero-trust-deposit-box p-4 rounded-2xl backdrop-blur-md", isLight ? "bg-white border border-slate-300 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)]" : "bg-white/5 border border-white/8"].join(" ")}>
                   <div className="flex justify-between items-center mb-2">
                     <span className={["text-xs", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>Base Deposit</span>
-                    <span className={["text-xs line-through", isLight ? "text-slate-500" : "text-white/40"].join(" ")}>2.50 ETH</span>
+                    <span className={["text-xs line-through", isLight ? "text-slate-500" : "text-white/40"].join(" ")}>{DEMO_ASSET.toFixed(2)} ETH</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className={["text-sm font-semibold", isLight ? "text-indigo-700" : "text-violet-300"].join(" ")}>Your Deposit</span>
-                    <span className={["text-lg font-extrabold", isLight ? "text-emerald-600" : "text-emerald-400"].join(" ")}>0.50 ETH</span>
+                    <span className={["text-lg font-extrabold", isLight ? "text-emerald-600" : "text-emerald-400"].join(" ")}>{heroDeposit.toFixed(2)} ETH</span>
                   </div>
                 </div>
                 <div className={["flex items-center justify-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5", isLight ? "text-emerald-700 bg-emerald-100/85 border border-emerald-300/70" : "text-emerald-400"].join(" ")}>
                   <TrendingDown className={["w-3.5 h-3.5", isLight ? "text-emerald-700" : "text-emerald-400"].join(" ")} />
-                  You saved 2.00 ETH (80% off)
+                  You saved {heroSaved.toFixed(2)} ETH ({Math.round((heroSaved / DEMO_ASSET) * 100)}% off)
                 </div>
               </div>
             </motion.div>
@@ -417,19 +450,21 @@ export default function LandingPage() {
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-[60px] pointer-events-none" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-violet-600/30 rounded-full blur-[60px] pointer-events-none" />
 
-            {/* Floating mini-card */}
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className={[
-                "hero-last-rental-card absolute -bottom-6 -left-8 border backdrop-blur-xl rounded-2xl px-4 py-3 z-30 shadow-xl",
-                isLight ? "bg-white border-slate-300 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.5)]" : "bg-black/60 border-white/10",
-              ].join(" ")}
-            >
-              <p className={["text-[10px] mb-1", isLight ? "text-slate-600" : "text-white/40"].join(" ")}>Last Rental</p>
-              <p className={["text-xs font-bold", isLight ? "text-slate-900" : "text-white"].join(" ")}>DSLR Camera Kit</p>
-              <p className="text-[10px] text-emerald-400 mt-0.5">+10 trust · 0.2 ETH unlocked</p>
-            </motion.div>
+            {/* Floating mini-card — last rental */}
+            {lastRental && (
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className={[
+                  "hero-last-rental-card absolute -bottom-6 -left-8 border backdrop-blur-xl rounded-2xl px-4 py-3 z-30 shadow-xl",
+                  isLight ? "bg-white border-slate-300 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.5)]" : "bg-black/60 border-white/10",
+                ].join(" ")}
+              >
+                <p className={["text-[10px] mb-1", isLight ? "text-slate-600" : "text-white/40"].join(" ")}>Last Rental</p>
+                <p className={["text-xs font-bold", isLight ? "text-slate-900" : "text-white"].join(" ")}>{lastRental}</p>
+                <p className="text-[10px] text-emerald-400 mt-0.5">+10 trust · {heroDeposit.toFixed(2)} ETH unlocked</p>
+              </motion.div>
+            )}
           </motion.div>
 
         </div>
@@ -483,14 +518,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Comparison: Traditional vs CollateralX ─────────────────────── */}
+      {/* ── Comparison: Traditional vs VeriFlow ─────────────────────── */}
       <section className="relative z-10 py-32 px-4 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/50 mb-5">
               <Activity className="w-3 h-3 text-cyan-400" /> See the Difference
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">Traditional vs CollateralX</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">Traditional vs VeriFlow</h2>
             <p className="mt-4 text-white/50 max-w-xl mx-auto">
               Why the old way of renting is broken — and how we fixed it.
             </p>
@@ -508,8 +543,8 @@ export default function LandingPage() {
               <div className="px-6 py-4 text-xs font-semibold text-white/40 uppercase tracking-widest">Feature</div>
               <div className="px-6 py-4 text-xs font-semibold text-red-400/70 uppercase tracking-widest border-l border-white/8">Traditional</div>
               <div className="px-6 py-4 text-xs font-semibold text-violet-400 uppercase tracking-widest border-l border-white/8 flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-[8px] font-bold text-white">CX</div>
-                CollateralX
+                <img src="/logo.png" alt="VeriFlow" className="w-4 h-4 object-contain" />
+                VeriFlow
               </div>
             </div>
 
@@ -606,7 +641,7 @@ export default function LandingPage() {
             </div>
             <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">Meet the Team</h2>
             <p className="mt-4 text-white/50 max-w-xl mx-auto">
-              The builders behind CollateralX making decentralized trust a reality.
+              The builders behind VeriFlow making decentralized trust a reality.
             </p>
           </div>
 
@@ -754,10 +789,8 @@ export default function LandingPage() {
             {/* Brand */}
             <div className="space-y-3 max-w-xs">
               <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">
-                  CX
-                </div>
-                CollateralX
+                <img src="/logo.png" alt="VeriFlow" className="w-7 h-7 object-contain" />
+                VeriFlow
               </div>
               <p className="text-xs text-white/30 leading-relaxed">
                 Programmable trust for peer-to-peer rental collateral. Non-custodial, open-source, on-chain.
@@ -802,7 +835,7 @@ export default function LandingPage() {
 
           <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-white/20">
-              © {new Date().getFullYear()} CollateralX Protocol. Open Source Testnet.
+              © {new Date().getFullYear()} VeriFlow Protocol. Open Source Testnet.
             </p>
             <p className="text-xs text-white/20">Built with 💜 on Ethereum</p>
           </div>

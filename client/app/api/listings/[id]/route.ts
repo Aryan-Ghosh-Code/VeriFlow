@@ -1,5 +1,5 @@
 // =============================================================================
-// CollateralX Protocol – API: /api/listings/[id]
+// VeriFlow Protocol – API: /api/listings/[id]
 // GET    → fetch a single listing by MongoDB _id or chainId
 // PATCH  → update listing (e.g. mark inactive, set chainId after tx confirms)
 // DELETE → soft-delete (sets isActive = false)

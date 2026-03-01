@@ -1,9 +1,9 @@
-// =============================================================================
-// CollateralX Protocol – App Configuration
+﻿// =============================================================================
+// VeriFlow Protocol – App Configuration
 // =============================================================================
 
 export const APP_CONFIG = {
-  name: "CollateralX Protocol",
+  name: "VeriFlow Protocol",
   tagline: "Programmable Trust for Rental Collateral",
   description:
     "A decentralized, risk-based collateral protocol for informal asset rentals. Dynamically adjusts security deposits based on your on-chain trust score.",

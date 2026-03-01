@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Raise Dispute Modal
+﻿// =============================================================================
+// VeriFlow Protocol – Raise Dispute Modal
 // =============================================================================
 
 "use client";
@@ -12,7 +12,7 @@ import { getContractWrite } from "@/lib/contract";
 import { useAppStore } from "@/store/useAppStore";
 import { ethToInrStr } from "@/lib/utils";
 
-// Matches DisputeSeverity enum in CollateralX.sol
+// Matches DisputeSeverity enum in VeriFlow.sol
 // None = 0, Minor = 1, Moderate = 2, Severe = 3
 const SEVERITIES = [
   {

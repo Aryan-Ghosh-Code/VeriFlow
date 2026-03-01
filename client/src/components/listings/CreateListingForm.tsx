@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Create Listing Form
+﻿// =============================================================================
+// VeriFlow Protocol – Create Listing Form
 // =============================================================================
 // Asset Value + Rental Fee: user inputs in INR → shows ETH equivalent below.
 // Phone: must be exactly 10 digits.

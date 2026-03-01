@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – API: /api/upload
+﻿// =============================================================================
+// VeriFlow Protocol – API: /api/upload
 // POST → accepts a multipart file, uploads to Cloudinary, returns { url }
 // =============================================================================
 // Uses the Cloudinary REST API directly (no SDK dependency needed).

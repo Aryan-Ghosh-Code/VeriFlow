@@ -1,4 +1,4 @@
-const hre  = require("hardhat");
+﻿const hre  = require("hardhat");
 const fs   = require("fs");
 const path = require("path");
 
@@ -6,13 +6,13 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners();
   console.log("Deploying with account:", deployer.address);
 
-  const Contract = await hre.ethers.getContractFactory("CollateralX");
+  const Contract = await hre.ethers.getContractFactory("VeriFlow");
   const contract = await Contract.deploy();
 
   await contract.waitForDeployment();
 
   const address = await contract.getAddress();
-  console.log("✅ CollateralX deployed to:", address);
+  console.log("✅ VeriFlow deployed to:", address);
 
   // ── Auto-update client/.env.local ────────────────────────────────────────
   const envPath = path.resolve(__dirname, "../../client/.env.local");

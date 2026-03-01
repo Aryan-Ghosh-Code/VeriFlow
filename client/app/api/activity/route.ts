@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – API: /api/activity
+﻿// =============================================================================
+// VeriFlow Protocol – API: /api/activity
 // GET  → latest N activity events for the landing page marquee ticker
 // POST → create a new activity event (called by backend/webhook after tx)
 // =============================================================================

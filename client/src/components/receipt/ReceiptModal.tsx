@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Receipt Modal
+﻿// =============================================================================
+// VeriFlow Protocol – Receipt Modal
 // =============================================================================
 
 "use client";
@@ -33,7 +33,7 @@ export function ReceiptModal() {
         <div className="rounded-2xl border border-white/8 bg-white/2 overflow-hidden font-mono">
           {/* Dashed separator top */}
           <div className="px-5 py-3 bg-violet-500/5 border-b border-dashed border-white/8 flex items-center justify-between">
-            <span className="text-xs text-violet-300 font-semibold uppercase tracking-wider">CollateralX</span>
+            <span className="text-xs text-violet-300 font-semibold uppercase tracking-wider">VeriFlow</span>
             <span className="text-[10px] text-white/30">{formatDate(completedAt)}</span>
           </div>
 

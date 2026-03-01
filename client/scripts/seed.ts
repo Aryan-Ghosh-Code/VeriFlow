@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Database Seed Script
+﻿// =============================================================================
+// VeriFlow Protocol – Database Seed Script
 // =============================================================================
 // Run once to populate MongoDB Atlas with demo listings and activity events.
 //

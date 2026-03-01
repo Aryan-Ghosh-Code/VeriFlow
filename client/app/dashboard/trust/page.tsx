@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Trust Profile Page (/dashboard/trust)
+﻿// =============================================================================
+// VeriFlow Protocol – Trust Profile Page (/dashboard/trust)
 // =============================================================================
 // On-chain source of truth: trust score + rental history from the contract.
 // MongoDB (UI layer): purely display/metadata. No financial data here.

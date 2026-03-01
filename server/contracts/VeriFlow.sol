@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: MIT
+﻿// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-contract CollateralX {
+contract VeriFlow {
     // ---- configuration ----------------------------------------------------
     uint256 public constant PERCENT_DENOMINATOR = 10000; // basis points
     uint256 public renterFeeBP = 100; // 1% of collateral paid by renter

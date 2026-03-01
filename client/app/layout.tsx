@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Root Layout
+﻿// =============================================================================
+// VeriFlow Protocol – Root Layout
 // =============================================================================
 
 import type { Metadata } from "next";
@@ -10,12 +10,12 @@ import { ReceiptModal } from "@/components/receipt/ReceiptModal";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "CollateralX Protocol – Programmable Trust for Rental Collateral",
+  title: "VeriFlow Protocol – Programmable Trust for Rental Collateral",
   description:
     "A decentralized, risk-based collateral protocol for informal asset rentals. Dynamic security deposits driven by your on-chain trust score.",
   keywords: ["Web3", "DeFi", "rental", "collateral", "trust score", "blockchain"],
   openGraph: {
-    title: "CollateralX Protocol",
+    title: "VeriFlow Protocol",
     description: "Programmable Trust for Rental Collateral",
     type: "website",
   },

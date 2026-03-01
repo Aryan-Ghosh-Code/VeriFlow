@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Ethers.js v6 helpers
+﻿// =============================================================================
+// VeriFlow Protocol – Ethers.js v6 helpers
 // =============================================================================
 
 import { ethers, BrowserProvider, JsonRpcSigner, JsonRpcProvider } from "ethers";

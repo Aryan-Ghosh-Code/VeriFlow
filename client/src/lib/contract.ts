@@ -1,12 +1,12 @@
-// =============================================================================
-// CollateralX Protocol – Contract ABI & Instance Factory
+﻿// =============================================================================
+// VeriFlow Protocol – Contract ABI & Instance Factory
 // =============================================================================
 
 import { ethers, Contract, JsonRpcSigner, JsonRpcProvider } from "ethers";
 import { CONTRACT_ADDRESS } from "@/config";
 
 // ---------------------------------------------------------------------------
-// ABI – matches the CollateralX on-chain contract interface.
+// ABI – matches the VeriFlow on-chain contract interface.
 // ---------------------------------------------------------------------------
 
 export const COLLATERAL_X_ABI = [

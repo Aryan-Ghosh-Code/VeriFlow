@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Navbar / Top Bar
+﻿// =============================================================================
+// VeriFlow Protocol – Navbar / Top Bar
 // =============================================================================
 
 "use client";
@@ -45,11 +45,9 @@ export function Navbar() {
 
           {/* ── Logo + Network badge ─────────────────────────────────────── */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-violet-900/40 group-hover:shadow-violet-600/50 transition-all duration-300 group-hover:scale-105">
-              CX
-            </div>
+            <img src="/logo.png" alt="VeriFlow" className="w-8 h-8 object-contain group-hover:scale-105 transition-transform duration-300" />
             <span className="font-semibold text-white hidden sm:block tracking-tight">
-              CollateralX
+              VeriFlow
             </span>
             {/* Testnet pill */}
             <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-400 tracking-wide">

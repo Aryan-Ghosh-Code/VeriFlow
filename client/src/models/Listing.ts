@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Listing Mongoose Model
+﻿// =============================================================================
+// VeriFlow Protocol – Listing Mongoose Model
 // =============================================================================
 // MongoDB is the UI source of truth for listing metadata.
 // On-chain data (deposit amount, rental status, escrow) lives in the contract.

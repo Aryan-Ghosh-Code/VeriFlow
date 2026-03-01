@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – ActivityEvent Mongoose Model
+﻿// =============================================================================
+// VeriFlow Protocol – ActivityEvent Mongoose Model
 // =============================================================================
 // Stores on-chain events as human-readable ticker entries for the landing
 // page marquee. Written by backend listeners or API handlers whenever a

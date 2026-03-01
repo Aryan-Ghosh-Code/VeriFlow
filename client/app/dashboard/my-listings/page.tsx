@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Owner Portal (/dashboard/my-listings)
+﻿// =============================================================================
+// VeriFlow Protocol – Owner Portal (/dashboard/my-listings)
 // Shows the listing owner all of their rented-out assets, renter info,
 // status, and gives them the power to Complete or Raise Dispute.
 // =============================================================================

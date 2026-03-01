@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – API: /api/listings
+﻿// =============================================================================
+// VeriFlow Protocol – API: /api/listings
 // GET  → returns all active listings (MongoDB source of truth)
 // POST → creates a new listing document
 // =============================================================================

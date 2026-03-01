@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Hardhat Tests
+﻿// =============================================================================
+// VeriFlow Protocol – Hardhat Tests
 // =============================================================================
 // Tests cover the core mathematical formulas from the v2.0 technical spec:
 //   1. Deposit calculation  (quadratic, 85-cap, 30% floor)
@@ -44,14 +44,14 @@ function expectedDepositPct(score) {
 
 async function deployFixture() {
   const [admin, owner, renter, renter2, arbiter] = await ethers.getSigners();
-  const CollateralX = await ethers.getContractFactory("CollateralX");
-  const cx = await CollateralX.deploy();
+  const VeriFlow = await ethers.getContractFactory("VeriFlow");
+  const cx = await VeriFlow.deploy();
   return { cx, admin, owner, renter, renter2, arbiter };
 }
 
 // ── 1. Deposit Calculation ─────────────────────────────────────────────────────
 
-describe("CollateralX", function () {
+describe("VeriFlow", function () {
 
   describe("1. calculateDeposit – quadratic formula", function () {
     it("new user (score 50 default) → 30% deposit + 1% weekly surcharge for 7d", async function () {

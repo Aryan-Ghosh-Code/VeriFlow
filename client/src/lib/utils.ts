@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – Utility Functions
+﻿// =============================================================================
+// VeriFlow Protocol – Utility Functions
 // =============================================================================
 
 import { ethers } from "ethers";
@@ -15,7 +15,7 @@ import type { TrustTier, TrustTierName } from "@/types/rental";
 // ─── Deposit Calculator ───────────────────────────────────────────────────────
 
 /**
- * Mirrors `calculateDeposit` in CollateralX.sol exactly.
+ * Mirrors `calculateDeposit` in VeriFlow.sol exactly.
  *
  *   effScore        = min(trustScore, 85)                    // score above 85 gives no benefit
  *   diff            = 85 − effScore                          // distance from gold cap
@@ -61,7 +61,7 @@ export function calcDeposit(
 }
 
 /**
- * Mirrors the rental-fee calculation in `startRental` in CollateralX.sol.
+ * Mirrors the rental-fee calculation in `startRental` in VeriFlow.sol.
  *
  *   uint256 days_   = _duration / 1 days;
  *   uint256 finalAmt = listing.rentalFeePerDay * days_;

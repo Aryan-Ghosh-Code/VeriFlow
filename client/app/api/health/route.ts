@@ -1,5 +1,5 @@
-// =============================================================================
-// CollateralX Protocol – API: /api/health
+﻿// =============================================================================
+// VeriFlow Protocol – API: /api/health
 // Quick connectivity test for MongoDB. Hit this endpoint in the browser
 // to see if the DB connection works.
 // =============================================================================

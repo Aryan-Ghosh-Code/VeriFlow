@@ -1,5 +1,5 @@
 // =============================================================================
-// CollateralX Protocol – Listing Detail Page (/dashboard/listings/[id])
+// VeriFlow Protocol – Listing Detail Page (/dashboard/listings/[id])
 // =============================================================================
 // Workflow:
 //   1. Load listing from store or on-chain
