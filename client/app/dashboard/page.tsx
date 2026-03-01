@@ -19,7 +19,6 @@ import {
   LayoutGrid,
   PackageSearch,
   ShieldCheck,
-  TrendingUp,
   ArrowRight,
   AlertCircle,
   Activity,
@@ -289,40 +288,7 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* ── Stats Bar ────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard
-          icon={<ShieldCheck className="w-5 h-5" />}
-          label="Trust Score"
-          value={scoreLoading ? "—" : trustScore.toString()}
-          sub={scoreLoading ? "Loading…" : `${trustTier?.name ?? "Bronze"} Tier`}
-          trend={!scoreLoading ? { dir: "up", text: "+10 per successful rental" } : undefined}
-          accent="violet"
-        />
-        <StatCard
-          icon={<TrendingUp className="w-5 h-5" />}
-          label="Deposit Saved"
-          value={scoreLoading ? "—" : depositSaved}
-          sub="vs. base rate"
-          trend={!scoreLoading ? { dir: "up", text: tierInfo.savingsDesc } : undefined}
-          accent="emerald"
-        />
-        <StatCard
-          icon={<LayoutGrid className="w-5 h-5" />}
-          label="Active Rentals"
-          value={activeCount.toString()}
-          sub="currently in progress"
-          trend={activeCount > 0 ? { dir: "neutral", text: `${completedCount} completed` } : undefined}
-          accent="cyan"
-        />
-        <StatCard
-          icon={<PackageSearch className="w-5 h-5" />}
-          label="Listings"
-          value={listingsLoading ? "—" : listings.length.toString()}
-          sub="available now"
-          trend={!listingsLoading ? { dir: "neutral", text: "on the market" } : undefined}
-          accent="amber"
-        />
-      </div>
+      {/* (Active Rentals & Listings moved into left panel below Tier callout) */}
 
       {/* ── Main Grid ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -344,22 +310,25 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* How to earn card */}
-          {/* <div className="rounded-2xl border border-white/8 bg-white/2 p-4 space-y-3">
-            <p className="text-xs font-semibold text-white/40 uppercase tracking-widest">
-              How Trust Works
-            </p>
-            {[
-              { icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />, text: "+10 pts per completed rental" },
-              { icon: <AlertTriangle className="w-4 h-4 text-red-400" />, text: "−20 pts per opened dispute" },
-              { icon: <Star className="w-4 h-4 text-yellow-400" />, text: "Gold tier unlocks 80% max savings" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                {item.icon}
-                <p className="text-xs text-white/60">{item.text}</p>
-              </div>
-            ))}
-          </div> */}
+          {/* Active Rentals & Listings stat cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard
+              icon={<LayoutGrid className="w-5 h-5" />}
+              label="Active Rentals"
+              value={activeCount.toString()}
+              sub="in progress"
+              trend={activeCount > 0 ? { dir: "neutral", text: `${completedCount} done` } : undefined}
+              accent="cyan"
+            />
+            <StatCard
+              icon={<PackageSearch className="w-5 h-5" />}
+              label="Listings"
+              value={listingsLoading ? "—" : listings.length.toString()}
+              sub="available"
+              trend={!listingsLoading ? { dir: "neutral", text: "on market" } : undefined}
+              accent="amber"
+            />
+          </div>
 
           {/* Quick Actions */}
           <div className="rounded-2xl border border-white/8 bg-white/2 p-4 space-y-2">
@@ -395,86 +364,87 @@ export default function DashboardPage() {
               />
             </motion.div>
           </div>
-
-          {/* Create Listing */}
-          <CreateListingForm />
         </motion.div>
 
         {/* ── Right panel ────────────────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="lg:col-span-2 space-y-5">
 
-          {/* Header row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-white tracking-tight">
-                Available Listings
-              </h2>
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20">
-                {listingsLoading ? "…" : listings.length}
-              </span>
-            </div>
-            <Link
-              href="/dashboard/listings"
-              className="flex items-center gap-1.5 text-sm font-medium text-white/40 hover:text-violet-300 transition-colors"
-            >
-              View all <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {/* Listings grid */}
-          <ListingGrid
-            listings={listings}
-            trustScore={trustScore}
-            isLoading={listingsLoading}
-          />
-
-          {/* ── Recent Activity Feed ──────────────────────────────────────── */}
-          <motion.div
-            variants={itemVariants}
-            className="rounded-2xl border border-white/8 bg-white/2 p-5"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-violet-400" />
-                <h3 className="text-sm font-bold text-white">Recent Activity</h3>
-              </div>
-              <Link
-                href="/dashboard/active"
-                className="text-xs text-white/40 hover:text-violet-300 transition-colors flex items-center gap-1"
-              >
-                All rentals <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-
-            {recentRentals.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-2xl mb-2">📋</p>
-                <p className="text-sm text-white/30">No recent activity — start renting to see your history here.</p>
-                <Link
-                  href="/dashboard/listings"
-                  className="mt-3 inline-block text-xs text-violet-400 hover:text-violet-300 underline underline-offset-4 transition-colors"
-                >
-                  Browse listings →
-                </Link>
-              </div>
-            ) : (
-              <div>
-                {recentRentals.map((r) => (
-                  <ActivityItem
-                    key={r.rentalId}
-                    label={r.assetName}
-                    sub={`Rental #${r.rentalId} · ${r.renter.slice(0, 6)}…${r.renter.slice(-4)}`}
-                    amount={`${r.depositPaid} ETH`}
-                    status={r.status}
-                    time={formatRelativeTime(r.startedAt)}
-                  />
-                ))}
-              </div>
-            )}
-          </motion.div>
+          {/* Create Listing — prominent at the top */}
+          <CreateListingForm />
 
         </motion.div>
       </div>
+
+      {/* ── Available Listings — Full Width ──────────────────────────────── */}
+      <motion.div variants={itemVariants} className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              Available Listings
+            </h2>
+            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20">
+              {listingsLoading ? "…" : listings.length}
+            </span>
+          </div>
+          <Link
+            href="/dashboard/listings"
+            className="flex items-center gap-1.5 text-sm font-medium text-white/40 hover:text-violet-300 transition-colors"
+          >
+            View all <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <ListingGrid
+          listings={listings}
+          trustScore={trustScore}
+          isLoading={listingsLoading}
+        />
+      </motion.div>
+
+      {/* ── Recent Activity Feed — Full Width ────────────────────────────── */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-2xl border border-white/8 bg-white/2 p-5"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-violet-400" />
+            <h3 className="text-sm font-bold text-white">Recent Activity</h3>
+          </div>
+          <Link
+            href="/dashboard/active"
+            className="text-xs text-white/40 hover:text-violet-300 transition-colors flex items-center gap-1"
+          >
+            All rentals <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+
+        {recentRentals.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-2xl mb-2">📋</p>
+            <p className="text-sm text-white/30">No recent activity — start renting to see your history here.</p>
+            <Link
+              href="/dashboard/listings"
+              className="mt-3 inline-block text-xs text-violet-400 hover:text-violet-300 underline underline-offset-4 transition-colors"
+            >
+              Browse listings →
+            </Link>
+          </div>
+        ) : (
+          <div>
+            {recentRentals.map((r) => (
+              <ActivityItem
+                key={r.rentalId}
+                label={r.assetName}
+                sub={`Rental #${r.rentalId} · ${r.renter.slice(0, 6)}…${r.renter.slice(-4)}`}
+                amount={`${r.depositPaid} ETH`}
+                status={r.status}
+                time={formatRelativeTime(r.startedAt)}
+              />
+            ))}
+          </div>
+        )}
+      </motion.div>
     </motion.div>
   );
 }

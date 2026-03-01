@@ -342,19 +342,38 @@ export default function LandingPage() {
               {isConnected ? (
                 <Link
                   href="/dashboard"
-                  className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold text-white overflow-hidden transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-violet-900/40"
+                  className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-semibold overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] backdrop-blur-md border border-violet-500/50 hover:border-violet-400/80"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(124,58,237,0.3) 0%, rgba(79,70,229,0.2) 50%, rgba(8,145,178,0.12) 100%)",
+                    boxShadow: "0 0 24px rgba(124,58,237,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+                  }}
                 >
-                  <span className="relative">Enter App</span>
-                  <ArrowRight className="relative w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {/* Glass top edge */}
+                  <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                  {/* Shimmer sweep */}
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12" />
+                  {/* Hover glow */}
+                  <span className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.25) 0%, transparent 70%)" }} />
+                  <span className="relative bg-gradient-to-r from-violet-200 via-white to-cyan-200 bg-clip-text text-transparent">Enter App</span>
+                  <ArrowRight className="relative w-4 h-4 text-violet-300 group-hover:translate-x-1 transition-transform" />
                 </Link>
               ) : (
                 <ConnectButton size="lg" />
               )}
               <a
                 href="#how-it-works"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-medium text-white/60 hover:text-white hover:bg-white/5 border border-white/8 hover:border-white/15 transition-all duration-200"
+                className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-medium overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] backdrop-blur-sm border border-white/12 hover:border-white/25"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.07)",
+                }}
               >
-                Learn More
+                {/* Glass top edge */}
+                <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                {/* Shimmer sweep */}
+                <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/8 to-transparent skew-x-12" />
+                <span className="relative text-white/60 group-hover:text-white/90 transition-colors duration-200">Learn More</span>
               </a>
             </div>
 

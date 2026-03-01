@@ -9,7 +9,6 @@
 
 import React, { useState, useRef } from "react";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 import { useAppStore } from "@/store/useAppStore";
 import { useListings } from "@/hooks/useListings";
 import { getSigner, getReadProvider } from "@/lib/ethers";
@@ -208,7 +207,7 @@ export function CreateListingForm() {
           {/* Image upload */}
           <div
             onClick={() => !uploading && fileRef.current?.click()}
-            className="relative h-32 rounded-xl border border-dashed border-white/10 bg-white/2 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all overflow-hidden flex items-center justify-center"
+            className="relative h-52 rounded-xl border border-dashed border-white/10 bg-white/2 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all overflow-hidden flex items-center justify-center"
           >
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -352,9 +351,38 @@ export function CreateListingForm() {
             />
           </Field>
 
-          <Button type="submit" loading={loading} className="w-full" size="lg">
-            Create Listing
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="relative w-full overflow-hidden rounded-xl px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group border border-violet-500/40 hover:border-violet-400/70 backdrop-blur-md"
+            style={{
+              background: "linear-gradient(135deg, rgba(124,58,237,0.25) 0%, rgba(79,70,229,0.15) 50%, rgba(8,145,178,0.1) 100%)",
+              boxShadow: "0 0 20px rgba(124,58,237,0.25), inset 0 1px 0 rgba(255,255,255,0.08)",
+            }}
+          >
+            {/* Glass inner highlight */}
+            <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            {/* Shimmer sweep on hover */}
+            <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12" />
+            {/* Hover glow fill */}
+            <span className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.2) 0%, transparent 70%)" }} />
+            <span className="relative flex items-center justify-center gap-2 drop-shadow-sm">
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 rounded-full border-2 border-violet-300/40 border-t-violet-300 animate-spin" />
+                  <span className="text-violet-200">Creating…</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-violet-300 text-base leading-none">✦</span>
+                  <span className="bg-gradient-to-r from-violet-200 via-white to-cyan-200 bg-clip-text text-transparent">
+                    Create Listing
+                  </span>
+                </>
+              )}
+            </span>
+          </button>
         </form>
       </CardBody>
     </Card>
