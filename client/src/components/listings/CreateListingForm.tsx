@@ -63,6 +63,7 @@ const EMPTY: FormData = {
 export function CreateListingForm() {
   const [form, setForm]       = useState<FormData>(EMPTY);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false); // image uploading to Cloudinary
   const [preview, setPreview] = useState<string | null>(null);
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -75,12 +76,30 @@ export function CreateListingForm() {
     if (key === "ownerPhone") setPhoneError(null); // clear error on type
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    setForm((prev) => ({ ...prev, imageUrl: url }));
+
+    // Show local preview immediately
+    const localUrl = URL.createObjectURL(file);
+    setPreview(localUrl);
+    setUploading(true);
+
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      // Replace blob URL with permanent Cloudinary URL
+      setForm((prev) => ({ ...prev, imageUrl: data.url }));
+    } catch (err: unknown) {
+      addToast({ type: "error", message: err instanceof Error ? err.message : "Image upload failed." });
+      setPreview(null);
+      setForm((prev) => ({ ...prev, imageUrl: "" }));
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Live ETH previews
@@ -92,6 +111,8 @@ export function CreateListingForm() {
     if (!walletAddress) return addToast({ type: "error", message: "Connect wallet first." });
     if (!form.assetName || !form.assetValueInr || !form.rentalFeePerDayInr)
       return addToast({ type: "error", message: "Fill all required fields." });
+    if (uploading)
+      return addToast({ type: "error", message: "Please wait — image is still uploading." });
 
     // Phone validation
     if (!isValidPhone(form.ownerPhone)) {
@@ -186,7 +207,7 @@ export function CreateListingForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Image upload */}
           <div
-            onClick={() => fileRef.current?.click()}
+            onClick={() => !uploading && fileRef.current?.click()}
             className="relative h-32 rounded-xl border border-dashed border-white/10 bg-white/2 cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/5 transition-all overflow-hidden flex items-center justify-center"
           >
             {preview ? (
@@ -196,6 +217,19 @@ export function CreateListingForm() {
               <div className="text-center">
                 <p className="text-2xl mb-1">🖼</p>
                 <p className="text-xs text-white/30">Click to upload image (optional)</p>
+              </div>
+            )}
+            {/* Upload progress overlay */}
+            {uploading && (
+              <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
+                <span className="h-6 w-6 rounded-full border-2 border-white/20 border-t-violet-400 animate-spin" />
+                <p className="text-xs text-white/70">Uploading to Cloudinary…</p>
+              </div>
+            )}
+            {/* Uploaded checkmark */}
+            {!uploading && form.imageUrl && (
+              <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-emerald-500/90 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">✓</span>
               </div>
             )}
           </div>

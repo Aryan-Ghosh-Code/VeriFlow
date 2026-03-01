@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@privy-io/react-auth": "^3.15.0",
+    "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
     "ethers": "^6.16.0",
     "framer-motion": "^12.34.3",
