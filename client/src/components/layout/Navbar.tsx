@@ -92,7 +92,7 @@ export function Navbar() {
           <div className="flex items-center gap-2 shrink-0">
             {/* GitHub */}
             <a
-              href="https://github.com"
+              href="https://github.com/Aryan-Ghosh-Code/VeriFlow"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex w-8 h-8 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] items-center justify-center text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200"
@@ -103,7 +103,7 @@ export function Navbar() {
 
             {/* Docs */}
             <a
-              href="#"
+              href="https://onlinelibrary.wiley.com/doi/10.1111/1467-9965.00068"
               className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-soft)] text-xs font-medium text-[var(--text-subtle)] hover:text-[var(--text-strong)] hover:bg-[var(--surface)] hover:border-[var(--border-strong)] transition-all duration-200"
             >
               Docs <ExternalLink className="w-3 h-3" />
@@ -160,14 +160,14 @@ export function Navbar() {
           })}
           <div className="flex items-center gap-3 pt-2 border-t border-white/5 mt-2">
             <a
-              href="https://github.com"
+              href="https://github.com/Aryan-Ghosh-Code/VeriFlow"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors"
             >
               <Github className="w-3.5 h-3.5" /> GitHub
             </a>
-            <a href="#" className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors">
+            <a href="https://onlinelibrary.wiley.com/doi/10.1111/1467-9965.00068" className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white transition-colors">
               Docs <ExternalLink className="w-3 h-3" />
             </a>
           </div>

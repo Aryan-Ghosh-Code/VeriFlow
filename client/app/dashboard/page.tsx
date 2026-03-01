@@ -345,7 +345,7 @@ export default function DashboardPage() {
           )}
 
           {/* How to earn card */}
-          <div className="rounded-2xl border border-white/8 bg-white/2 p-4 space-y-3">
+          {/* <div className="rounded-2xl border border-white/8 bg-white/2 p-4 space-y-3">
             <p className="text-xs font-semibold text-white/40 uppercase tracking-widest">
               How Trust Works
             </p>
@@ -359,7 +359,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-white/60">{item.text}</p>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* Quick Actions */}
           <div className="rounded-2xl border border-white/8 bg-white/2 p-4 space-y-2">

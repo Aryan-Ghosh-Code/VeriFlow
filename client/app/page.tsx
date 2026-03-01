@@ -57,9 +57,21 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { label: "Avg. Deposit Saved", value: "34%", icon: <Coins className="w-4 h-4" /> },
-  { label: "Trust Tiers", value: "3", icon: <ShieldCheck className="w-4 h-4" /> },
-  { label: "Platform Fee", value: "1%", icon: <Activity className="w-4 h-4" /> },
+  {
+    label: "Avg. Deposit Saved",
+    value: "34%",
+    icon: <Coins className="w-4 h-4" />,
+  },
+  {
+    label: "Trust Tiers",
+    value: "3",
+    icon: <ShieldCheck className="w-4 h-4" />,
+  },
+  {
+    label: "Platform Fee",
+    value: "1%",
+    icon: <Activity className="w-4 h-4" />,
+  },
 ];
 
 const STEPS = [
@@ -79,19 +91,22 @@ const STEPS = [
 
 const TESTIMONIALS = [
   {
-    quote: "VeriFlow cut my deposit by 60%. I listed a camera kit and the renter got approved in seconds. This is the future of peer-to-peer rental.",
+    quote:
+      "VeriFlow reduced my deposit by 60%. I listed my camera kit, and the renter was approved instantly based on their trust score. This is how peer‑to‑peer rentals should work.",
     name: "Alex K.",
     handle: "@alexk.eth",
     tier: "Gold",
   },
   {
-    quote: "I was skeptical about on-chain trust scores, but my score of 720 saved me 350 USDC on my first rental. Absolutely wild.",
+    quote:
+      "I didn’t believe dynamic collateral would make a difference — but my trust score lowered my required deposit significantly. Behavior based deposits just make sense.",
     name: "Priya S.",
     handle: "@priyaseth.eth",
     tier: "Silver",
   },
   {
-    quote: "The smart contract held the deposit perfectly. When I returned the item, funds were released instantly. No disputes, no middlemen.",
+    quote:
+      "The smart contract escrow worked flawlessly. The deposit was locked securely, and the moment I returned the gear, funds were released automatically. No follow-ups. No middlemen.",
     name: "Mateus R.",
     handle: "@mrdev.eth",
     tier: "Gold",
@@ -107,37 +122,37 @@ const PROTOCOL_HIGHLIGHTS = [
 
 const TEAM = [
   {
-    name: "Aryan Ghosh",
-    role: "Founder & CEO",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aryan",
+    name: "Spandan Chakraborty",
+    role: "Team Lead",
+    image: "/spandan.jpeg",
     bio: "Building the future of collateralized trust. Obsessed with on-chain reputation.",
-    linkedin: "https://linkedin.com/in/aryanghosh",
-    github: "https://github.com/aryan-eth",
+    linkedin: "https://www.linkedin.com/in/spandan-chakraborty-41289123b/",
+    github: "https://github.com/Spandan-Chakraborty",
   },
   {
-    name: "Sarah Chen",
-    role: "CTO",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    name: "Aryan Ghosh",
+    role: "",
+    image: "/aryan.jpeg",
     bio: "Smart contract auditor and protocol architect. Security maximalist.",
-    linkedin: "https://linkedin.com/in/sarahchen",
-    github: "https://github.com/sarahcodes",
+    linkedin: "https://www.linkedin.com/in/aryan-ghosh-83a26631b/",
+    github: "https://github.com/Aryan-Ghosh-Code",
   },
   {
-    name: "Marcus Wright",
+    name: "Priyunshu Saha",
     role: "Head of Product",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
+    image: "/priya.jpeg",
     bio: "Former product lead at leading DeFi protocols. Focused on seamless UX.",
-    linkedin: "https://linkedin.com/in/marcuswright",
-    github: "https://github.com/marcusdefi",
+    linkedin: "https://www.linkedin.com/in/priyunshu-saha/",
+    github: "https://github.com/PRIYUNSHU21",
   },
   {
-    name: "Elena Rodriguez",
+    name: "Souhardya Ray",
     role: "Lead Engineer",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena",
+    image: "/sou.jpeg",
     bio: "Full-stack Web3 developer. Bridging the gap between UI and smart contracts.",
-    linkedin: "https://linkedin.com/in/elenarodriguez",
-    github: "https://github.com/elenabuilds",
-  }
+    linkedin: "https://www.linkedin.com/in/souhardya-ray-877146290",
+    github: "https://github.com/Souhardya-Ray",
+  },
 ];
 
 // Comparison data: traditional vs VeriFlow
@@ -204,10 +219,7 @@ function Marquee({ events }: { events: string[] }) {
 
       <div className="flex gap-10 animate-marquee whitespace-nowrap w-max">
         {[...display, ...display].map((event, i) => (
-          <span
-            key={i}
-            className="text-xs font-medium text-white/40 px-4"
-          >
+          <span key={i} className="text-xs font-medium text-white/40 px-4">
             {event}
           </span>
         ))}
@@ -225,28 +237,29 @@ export default function LandingPage() {
   const [tickerEvents, setTickerEvents] = useState<string[]>([]);
 
   // Real-time data — only fetched when connected
-  const { trustScore: liveScore, trustTier: liveTier } = useTrustScore(walletAddress);
+  const { trustScore: liveScore, trustTier: liveTier } =
+    useTrustScore(walletAddress);
   const { activeRentals } = useAppStore();
 
   // Hero card values: real when connected, demo fallback when not
-  const DEMO_SCORE    = 85;   // displayed as "85" in the hero (realistic)
-  const DEMO_TIER     = "Gold";
-  const DEMO_ASSET    = 2.5;  // ETH sample asset for deposit calc
-  const DEMO_RENTAL   = "DSLR Camera Kit";
+  const DEMO_SCORE = 85; // displayed as "85" in the hero (realistic)
+  const DEMO_TIER = "Gold";
+  const DEMO_ASSET = 2.5; // ETH sample asset for deposit calc
+  const DEMO_RENTAL = "DSLR Camera Kit";
 
-  const heroScore   = isConnected ? liveScore     : DEMO_SCORE;
-  const heroTier    = isConnected ? (liveTier?.name ?? DEMO_TIER) : DEMO_TIER;
-  const lastRental  = isConnected
+  const heroScore = isConnected ? liveScore : DEMO_SCORE;
+  const heroTier = isConnected ? (liveTier?.name ?? DEMO_TIER) : DEMO_TIER;
+  const lastRental = isConnected
     ? (activeRentals[activeRentals.length - 1]?.assetName ?? null)
     : DEMO_RENTAL;
 
   // Deposit calc (same curve as contract)
   const { deposit: heroDeposit } = calcDeposit(DEMO_ASSET, heroScore);
-  const heroSaved   = DEMO_ASSET - heroDeposit;
+  const heroSaved = DEMO_ASSET - heroDeposit;
   const progressPct = Math.round((heroScore / 100) * 100);
 
   const tierBadgeClass: Record<string, string> = {
-    Gold:   "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
+    Gold: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
     Silver: "bg-zinc-500/10 border-zinc-500/20 text-zinc-300",
     Bronze: "bg-amber-500/10 border-amber-500/20 text-amber-400",
   };
@@ -254,9 +267,9 @@ export default function LandingPage() {
   // Fetch live activity events from MongoDB
   useEffect(() => {
     fetch("/api/activity?limit=20")
-      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((data: { message: string }[]) =>
-        setTickerEvents(data.map((e) => e.message))
+        setTickerEvents(data.map((e) => e.message)),
       )
       .catch(() => {
         // Silently fall back to static events
@@ -266,7 +279,6 @@ export default function LandingPage() {
 
   return (
     <div className="relative overflow-x-hidden selection:bg-violet-500/30">
-
       {/* ── Ambient Background ──────────────────────────────────────────── */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         {/* Primary orbs */}
@@ -284,7 +296,8 @@ export default function LandingPage() {
               linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)
             `,
             backgroundSize: "64px 64px",
-            maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%)",
+            maskImage:
+              "radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%)",
           }}
         />
       </div>
@@ -292,7 +305,6 @@ export default function LandingPage() {
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <section className="relative z-10 flex flex-col items-center justify-center min-h-[90vh] px-4 pt-20 pb-16">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-
           {/* Left: Copy */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -321,8 +333,9 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light">
-              Stop overpaying in locked collateral. VeriFlow uses your true on-chain reputation to dynamically lower security deposits by up to{" "}
-              <span className="text-emerald-400 font-semibold">80%</span>.
+              Stop overpaying in locked collateral. VeriFlow uses your true
+              on-chain reputation to dynamically lower security deposits by up
+              to <span className="text-emerald-400 font-semibold">80%</span>.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
@@ -357,9 +370,13 @@ export default function LandingPage() {
                 >
                   <div className="flex items-center gap-1.5 text-violet-400">
                     {s.icon}
-                    <span className="text-2xl font-bold text-white">{s.value}</span>
+                    <span className="text-2xl font-bold text-white">
+                      {s.value}
+                    </span>
                   </div>
-                  <span className="text-xs text-white/40 font-medium">{s.label}</span>
+                  <span className="text-xs text-white/40 font-medium">
+                    {s.label}
+                  </span>
                 </motion.div>
               ))}
             </div>
@@ -395,53 +412,135 @@ export default function LandingPage() {
                     </span>
                     {isConnected ? "Live · Connected" : "Live Network"}
                   </div>
-                  <div className={`px-3 py-1 rounded-full border text-xs font-bold ${tierBadgeClass[heroTier] ?? tierBadgeClass.Gold}`}>
+                  <div
+                    className={`px-3 py-1 rounded-full border text-xs font-bold ${tierBadgeClass[heroTier] ?? tierBadgeClass.Gold}`}
+                  >
                     {heroTier} Tier
                   </div>
                 </div>
 
                 {/* Score */}
                 <div>
-                  <h3 className={["hero-trust-label text-sm font-medium mb-1", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>Your Trust Score</h3>
-                  <div className={["hero-trust-score text-6xl font-black text-transparent bg-clip-text", isLight ? "bg-gradient-to-br from-slate-900 via-indigo-700 to-cyan-600" : "bg-gradient-to-br from-white to-white/60"].join(" ")}>
+                  <h3
+                    className={[
+                      "hero-trust-label text-sm font-medium mb-1",
+                      isLight ? "text-slate-600" : "text-white/50",
+                    ].join(" ")}
+                  >
+                    Your Trust Score
+                  </h3>
+                  <div
+                    className={[
+                      "hero-trust-score text-6xl font-black text-transparent bg-clip-text",
+                      isLight
+                        ? "bg-gradient-to-br from-slate-900 via-indigo-700 to-cyan-600"
+                        : "bg-gradient-to-br from-white to-white/60",
+                    ].join(" ")}
+                  >
                     {heroScore}
                   </div>
                   <p className="text-xs text-emerald-400 mt-1 font-medium">
-                    {isConnected ? `↑ Your on-chain score` : "↑ Top 5% of network"}
+                    {isConnected
+                      ? `↑ Your on-chain score`
+                      : "↑ Top 5% of network"}
                   </p>
                 </div>
 
                 {/* Progress bar */}
                 <div className="space-y-3">
-                  <div className={["hero-trust-progress-track h-2 w-full rounded-full overflow-hidden", isLight ? "bg-slate-300/60" : "bg-white/5"].join(" ")}>
+                  <div
+                    className={[
+                      "hero-trust-progress-track h-2 w-full rounded-full overflow-hidden",
+                      isLight ? "bg-slate-300/60" : "bg-white/5",
+                    ].join(" ")}
+                  >
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${progressPct}%` }}
-                      transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+                      transition={{
+                        duration: 1.5,
+                        delay: 0.5,
+                        ease: "easeOut",
+                      }}
                       className="h-full bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full"
                     />
                   </div>
-                  <div className={["hero-trust-tier-labels flex justify-between text-[10px]", isLight ? "text-slate-500" : "text-white/30"].join(" ")}>
-                    <span>Bronze</span><span>Silver</span><span>Gold</span>
+                  <div
+                    className={[
+                      "hero-trust-tier-labels flex justify-between text-[10px]",
+                      isLight ? "text-slate-500" : "text-white/30",
+                    ].join(" ")}
+                  >
+                    <span>Bronze</span>
+                    <span>Silver</span>
+                    <span>Gold</span>
                   </div>
                 </div>
               </div>
 
               {/* Deposit preview */}
               <div className="relative z-10 space-y-3">
-                <div className={["hero-trust-deposit-box p-4 rounded-2xl backdrop-blur-md", isLight ? "bg-white border border-slate-300 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)]" : "bg-white/5 border border-white/8"].join(" ")}>
+                <div
+                  className={[
+                    "hero-trust-deposit-box p-4 rounded-2xl backdrop-blur-md",
+                    isLight
+                      ? "bg-white border border-slate-300 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)]"
+                      : "bg-white/5 border border-white/8",
+                  ].join(" ")}
+                >
                   <div className="flex justify-between items-center mb-2">
-                    <span className={["text-xs", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>Base Deposit</span>
-                    <span className={["text-xs line-through", isLight ? "text-slate-500" : "text-white/40"].join(" ")}>{DEMO_ASSET.toFixed(2)} ETH</span>
+                    <span
+                      className={[
+                        "text-xs",
+                        isLight ? "text-slate-600" : "text-white/50",
+                      ].join(" ")}
+                    >
+                      Base Deposit
+                    </span>
+                    <span
+                      className={[
+                        "text-xs line-through",
+                        isLight ? "text-slate-500" : "text-white/40",
+                      ].join(" ")}
+                    >
+                      {DEMO_ASSET.toFixed(2)} ETH
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className={["text-sm font-semibold", isLight ? "text-indigo-700" : "text-violet-300"].join(" ")}>Your Deposit</span>
-                    <span className={["text-lg font-extrabold", isLight ? "text-emerald-600" : "text-emerald-400"].join(" ")}>{heroDeposit.toFixed(2)} ETH</span>
+                    <span
+                      className={[
+                        "text-sm font-semibold",
+                        isLight ? "text-indigo-700" : "text-violet-300",
+                      ].join(" ")}
+                    >
+                      Your Deposit
+                    </span>
+                    <span
+                      className={[
+                        "text-lg font-extrabold",
+                        isLight ? "text-emerald-600" : "text-emerald-400",
+                      ].join(" ")}
+                    >
+                      {heroDeposit.toFixed(2)} ETH
+                    </span>
                   </div>
                 </div>
-                <div className={["flex items-center justify-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5", isLight ? "text-emerald-700 bg-emerald-100/85 border border-emerald-300/70" : "text-emerald-400"].join(" ")}>
-                  <TrendingDown className={["w-3.5 h-3.5", isLight ? "text-emerald-700" : "text-emerald-400"].join(" ")} />
-                  You saved {heroSaved.toFixed(2)} ETH ({Math.round((heroSaved / DEMO_ASSET) * 100)}% off)
+                <div
+                  className={[
+                    "flex items-center justify-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5",
+                    isLight
+                      ? "text-emerald-700 bg-emerald-100/85 border border-emerald-300/70"
+                      : "text-emerald-400",
+                  ].join(" ")}
+                >
+                  <TrendingDown
+                    className={[
+                      "w-3.5 h-3.5",
+                      isLight ? "text-emerald-700" : "text-emerald-400",
+                    ].join(" ")}
+                  />
+                  You saved {heroSaved.toFixed(2)} ETH (
+                  {Math.round((heroSaved / DEMO_ASSET) * 100)}% off)
                 </div>
               </div>
             </motion.div>
@@ -454,19 +553,41 @@ export default function LandingPage() {
             {lastRental && (
               <motion.div
                 animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1,
+                }}
                 className={[
                   "hero-last-rental-card absolute -bottom-6 -left-8 border backdrop-blur-xl rounded-2xl px-4 py-3 z-30 shadow-xl",
-                  isLight ? "bg-white border-slate-300 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.5)]" : "bg-black/60 border-white/10",
+                  isLight
+                    ? "bg-white border-slate-300 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.5)]"
+                    : "bg-black/60 border-white/10",
                 ].join(" ")}
               >
-                <p className={["text-[10px] mb-1", isLight ? "text-slate-600" : "text-white/40"].join(" ")}>Last Rental</p>
-                <p className={["text-xs font-bold", isLight ? "text-slate-900" : "text-white"].join(" ")}>{lastRental}</p>
-                <p className="text-[10px] text-emerald-400 mt-0.5">+10 trust · {heroDeposit.toFixed(2)} ETH unlocked</p>
+                <p
+                  className={[
+                    "text-[10px] mb-1",
+                    isLight ? "text-slate-600" : "text-white/40",
+                  ].join(" ")}
+                >
+                  Last Rental
+                </p>
+                <p
+                  className={[
+                    "text-xs font-bold",
+                    isLight ? "text-slate-900" : "text-white",
+                  ].join(" ")}
+                >
+                  {lastRental}
+                </p>
+                <p className="text-[10px] text-emerald-400 mt-0.5">
+                  +10 trust · {heroDeposit.toFixed(2)} ETH unlocked
+                </p>
               </motion.div>
             )}
           </motion.div>
-
         </div>
       </section>
 
@@ -476,20 +597,31 @@ export default function LandingPage() {
       </div>
 
       {/* ── How It Works ───────────────────────────────────────────────── */}
-      <section id="how-it-works" className="relative z-10 py-32 px-4 border-t border-white/5 bg-black/20">
+      <section
+        id="how-it-works"
+        className="relative z-10 py-32 px-4 border-t border-white/5 bg-black/20"
+      >
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/50 mb-5">
               <Zap className="w-3 h-3 text-violet-400" /> Simple & Secure
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">How the Engine Works</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+              How the Engine Works
+            </h2>
             <p className="mt-4 text-white/50 max-w-xl mx-auto text-lg">
-              Three simple steps to unlock your financial reputation and stop overcollateralizing.
+              Three simple steps to unlock your financial reputation and stop
+              overcollateralizing.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <div className={["how-steps-line hidden md:block absolute top-[45px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-transparent to-transparent", isLight ? "via-indigo-500/40" : "via-violet-500/20"].join(" ")} />
+            <div
+              className={[
+                "how-steps-line hidden md:block absolute top-[45px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-transparent to-transparent",
+                isLight ? "via-indigo-500/40" : "via-violet-500/20",
+              ].join(" ")}
+            />
 
             {STEPS.map((step, i) => (
               <motion.div
@@ -500,18 +632,41 @@ export default function LandingPage() {
                 transition={{ duration: 0.5, delay: i * 0.2 }}
                 className="how-step-item relative flex flex-col items-center text-center group"
               >
-                <div className={[
-                  "how-step-number-card w-24 h-24 mb-6 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 relative z-10",
-                  isLight
-                    ? "bg-white/95 border border-indigo-300/60 shadow-[0_14px_28px_-18px_rgba(15,23,42,0.4)] group-hover:border-indigo-500/60"
-                    : "bg-white/3 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] group-hover:border-violet-500/50 group-hover:bg-violet-500/5",
-                ].join(" ")}>
-                  <div className={["how-step-number text-3xl font-black text-transparent bg-clip-text", isLight ? "bg-gradient-to-br from-indigo-900 to-cyan-600" : "bg-gradient-to-br from-white to-white/20"].join(" ")}>
+                <div
+                  className={[
+                    "how-step-number-card w-24 h-24 mb-6 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 relative z-10",
+                    isLight
+                      ? "bg-white/95 border border-indigo-300/60 shadow-[0_14px_28px_-18px_rgba(15,23,42,0.4)] group-hover:border-indigo-500/60"
+                      : "bg-white/3 border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] group-hover:border-violet-500/50 group-hover:bg-violet-500/5",
+                  ].join(" ")}
+                >
+                  <div
+                    className={[
+                      "how-step-number text-3xl font-black text-transparent bg-clip-text",
+                      isLight
+                        ? "bg-gradient-to-br from-indigo-900 to-cyan-600"
+                        : "bg-gradient-to-br from-white to-white/20",
+                    ].join(" ")}
+                  >
                     0{i + 1}
                   </div>
                 </div>
-                <h3 className={["how-step-title text-xl font-bold mb-3", isLight ? "text-slate-900" : "text-white"].join(" ")}>{step.title}</h3>
-                <p className={["how-step-desc text-sm leading-relaxed max-w-xs", isLight ? "text-slate-600" : "text-white/50"].join(" ")}>{step.desc}</p>
+                <h3
+                  className={[
+                    "how-step-title text-xl font-bold mb-3",
+                    isLight ? "text-slate-900" : "text-white",
+                  ].join(" ")}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className={[
+                    "how-step-desc text-sm leading-relaxed max-w-xs",
+                    isLight ? "text-slate-600" : "text-white/50",
+                  ].join(" ")}
+                >
+                  {step.desc}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -525,7 +680,9 @@ export default function LandingPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/50 mb-5">
               <Activity className="w-3 h-3 text-cyan-400" /> See the Difference
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">Traditional vs VeriFlow</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+              Traditional vs VeriFlow
+            </h2>
             <p className="mt-4 text-white/50 max-w-xl mx-auto">
               Why the old way of renting is broken — and how we fixed it.
             </p>
@@ -540,10 +697,18 @@ export default function LandingPage() {
           >
             {/* Table header */}
             <div className="grid grid-cols-3 border-b border-white/8 bg-white/3">
-              <div className="px-6 py-4 text-xs font-semibold text-white/40 uppercase tracking-widest">Feature</div>
-              <div className="px-6 py-4 text-xs font-semibold text-red-400/70 uppercase tracking-widest border-l border-white/8">Traditional</div>
+              <div className="px-6 py-4 text-xs font-semibold text-white/40 uppercase tracking-widest">
+                Feature
+              </div>
+              <div className="px-6 py-4 text-xs font-semibold text-red-400/70 uppercase tracking-widest border-l border-white/8">
+                Traditional
+              </div>
               <div className="px-6 py-4 text-xs font-semibold text-violet-400 uppercase tracking-widest border-l border-white/8 flex items-center gap-2">
-                <img src="/logo.png" alt="VeriFlow" className="w-4 h-4 object-contain" />
+                <img
+                  src="/logo.png"
+                  alt="VeriFlow"
+                  className="w-4 h-4 object-contain"
+                />
                 VeriFlow
               </div>
             </div>
@@ -553,7 +718,9 @@ export default function LandingPage() {
                 key={row.feature}
                 className={`grid grid-cols-3 border-b border-white/5 last:border-0 ${i % 2 === 0 ? "bg-transparent" : "bg-white/[0.01]"}`}
               >
-                <div className="px-6 py-4 text-sm font-medium text-white/70">{row.feature}</div>
+                <div className="px-6 py-4 text-sm font-medium text-white/70">
+                  {row.feature}
+                </div>
                 <div className="px-6 py-4 text-sm text-red-400/70 border-l border-white/5 flex items-start gap-2">
                   <XCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500/40" />
                   {row.traditional}
@@ -575,7 +742,9 @@ export default function LandingPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/60 mb-6">
               <Sparkles className="w-3 h-3" /> Built for the Future
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">Uncompromising Protocol</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+              Uncompromising Protocol
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[220px]">
@@ -591,8 +760,12 @@ export default function LandingPage() {
                 {/* Hover gradient bleed */}
                 <div className="absolute inset-0 bg-gradient-to-br from-violet-500/0 to-violet-500/8 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 {/* Subtle shimmer border on hover */}
-                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ backgroundImage: "linear-gradient(135deg, rgba(139,92,246,0.15) 0%, transparent 50%, rgba(99,102,241,0.1) 100%)" }}
+                <div
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(135deg, rgba(139,92,246,0.15) 0%, transparent 50%, rgba(99,102,241,0.1) 100%)",
+                  }}
                 />
 
                 <div className="relative z-10 p-8 flex flex-col h-full">
@@ -600,7 +773,9 @@ export default function LandingPage() {
                     {f.icon}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">{f.title}</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {f.title}
+                    </h3>
                     <p className="text-sm text-white/50">{f.desc}</p>
                   </div>
                 </div>
@@ -639,7 +814,9 @@ export default function LandingPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/50 mb-6">
               <Users className="w-3.5 h-3.5" /> Core Contributors
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">Meet the Team</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+              Meet the Team
+            </h2>
             <p className="mt-4 text-white/50 max-w-xl mx-auto">
               The builders behind VeriFlow making decentralized trust a reality.
             </p>
@@ -656,15 +833,31 @@ export default function LandingPage() {
                 className="group relative rounded-3xl border border-white/8 bg-white/2 p-6 hover:bg-white/5 hover:border-violet-500/30 transition-all duration-300 text-center flex flex-col h-full"
               >
                 {/* Subtle animated border on hover */}
-                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundImage: "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, transparent 50%, rgba(99,102,241,0.05) 100%)" }} />
-                
+                <div
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, transparent 50%, rgba(99,102,241,0.05) 100%)",
+                  }}
+                />
+
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="mx-auto w-24 h-24 mb-5 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-violet-500/50 transition-colors bg-white/5 p-1 shrink-0">
-                    <img src={member.image} alt={member.name} className="w-full h-full object-cover rounded-full" />
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
                   </div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-violet-300 transition-colors">{member.name}</h3>
-                  <p className="text-xs font-semibold text-violet-400 mb-3">{member.role}</p>
-                  <p className="text-xs text-white/50 leading-relaxed mb-4 flex-1">{member.bio}</p>
+                  <h3 className="text-lg font-bold text-white group-hover:text-violet-300 transition-colors">
+                    {member.name}
+                  </h3>
+                  <p className="text-xs font-semibold text-violet-400 mb-3">
+                    {member.role}
+                  </p>
+                  <p className="text-xs text-white/50 leading-relaxed mb-4 flex-1">
+                    {member.bio}
+                  </p>
                   <div className="pt-4 border-t border-white/5 mt-auto">
                     <div className="flex items-center justify-center gap-4">
                       <a
@@ -699,7 +892,9 @@ export default function LandingPage() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/50 mb-6">
               <Users className="w-3.5 h-3.5" /> Trusted by Early Adopters
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">What Users Say</h2>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight">
+              What Users Say
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -713,17 +908,21 @@ export default function LandingPage() {
                 className="relative rounded-2xl border border-white/8 bg-white/3 p-7 flex flex-col gap-5 hover:border-violet-500/25 hover:bg-white/5 hover:shadow-[0_0_40px_rgba(139,92,246,0.08)] transition-all duration-300 group"
               >
                 <Quote className="w-6 h-6 text-violet-500/40 group-hover:text-violet-400/60 transition-colors" />
-                <p className="text-sm text-white/70 leading-relaxed flex-1">{t.quote}</p>
+                <p className="text-sm text-white/70 leading-relaxed flex-1">
+                  {t.quote}
+                </p>
                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
                   <div>
                     <p className="text-sm font-semibold text-white">{t.name}</p>
                     <p className="text-xs text-white/30">{t.handle}</p>
                   </div>
-                  <div className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
-                    t.tier === "Gold"
-                      ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                      : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-                  }`}>
+                  <div
+                    className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
+                      t.tier === "Gold"
+                        ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
+                        : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                    }`}
+                  >
                     {t.tier} Tier
                   </div>
                 </div>
@@ -746,7 +945,13 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-violet-900/30 to-transparent rounded-3xl" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-violet-600/20 rounded-full blur-[80px] pointer-events-none" />
             {/* Subtle animated ring */}
-            <div className="absolute inset-0 rounded-3xl" style={{ backgroundImage: "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, transparent 40%, rgba(99,102,241,0.05) 100%)" }} />
+            <div
+              className="absolute inset-0 rounded-3xl"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, transparent 40%, rgba(99,102,241,0.05) 100%)",
+              }}
+            />
 
             <div className="relative z-10 space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-xs font-semibold text-violet-300">
@@ -758,14 +963,16 @@ export default function LandingPage() {
               </div>
 
               <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-                Start Renting Smarter,<br />
+                Start Renting Smarter,
+                <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
                   Starting Today.
                 </span>
               </h2>
 
               <p className="text-lg text-white/50 max-w-xl mx-auto">
-                Join the protocol redefining rental collateral. Connect your wallet and unlock your on-chain reputation in seconds.
+                Join the protocol redefining rental collateral. Connect your
+                wallet and unlock your on-chain reputation in seconds.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -789,11 +996,16 @@ export default function LandingPage() {
             {/* Brand */}
             <div className="space-y-3 max-w-xs">
               <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
-                <img src="/logo.png" alt="VeriFlow" className="w-7 h-7 object-contain" />
+                <img
+                  src="/logo.png"
+                  alt="VeriFlow"
+                  className="w-7 h-7 object-contain"
+                />
                 VeriFlow
               </div>
               <p className="text-xs text-white/30 leading-relaxed">
-                Programmable trust for peer-to-peer rental collateral. Non-custodial, open-source, on-chain.
+                Programmable trust for peer-to-peer rental collateral.
+                Non-custodial, open-source, on-chain.
               </p>
               <div className="flex items-center gap-1.5 text-xs text-amber-400">
                 <span className="relative flex h-1.5 w-1.5">
@@ -806,28 +1018,79 @@ export default function LandingPage() {
 
             {/* Links */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-              <div>
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">Protocol</p>
+              {/* <div>
+                <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">
+                  Protocol
+                </p>
                 <div className="space-y-2">
-                  <Link href="#" className="block text-sm text-white/30 hover:text-white transition-colors">Documentation</Link>
-                  <Link href="#" className="block text-sm text-white/30 hover:text-white transition-colors">Smart Contracts</Link>
-                  <Link href="#" className="block text-sm text-white/30 hover:text-white transition-colors">Audit Reports</Link>
+                  <Link
+                    href="#"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Documentation
+                  </Link>
+                  <Link
+                    href="#"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Smart Contracts
+                  </Link>
+                  <Link
+                    href="#"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Audit Reports
+                  </Link>
+                </div>
+              </div> */}
+              <div>
+                <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">
+                  App
+                </p>
+                <div className="space-y-2">
+                  <Link
+                    href="/dashboard"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/dashboard/listings"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Listings
+                  </Link>
+                  <Link
+                    href="/dashboard/active"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    My Rentals
+                  </Link>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">App</p>
+                <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">
+                  Community
+                </p>
                 <div className="space-y-2">
-                  <Link href="/dashboard" className="block text-sm text-white/30 hover:text-white transition-colors">Dashboard</Link>
-                  <Link href="/dashboard/listings" className="block text-sm text-white/30 hover:text-white transition-colors">Listings</Link>
-                  <Link href="/dashboard/active" className="block text-sm text-white/30 hover:text-white transition-colors">My Rentals</Link>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-3">Community</p>
-                <div className="space-y-2">
-                  <Link href="#" className="block text-sm text-white/30 hover:text-white transition-colors">Twitter / X</Link>
-                  <Link href="#" className="block text-sm text-white/30 hover:text-white transition-colors">GitHub</Link>
-                  <Link href="#" className="block text-sm text-white/30 hover:text-white transition-colors">Discord</Link>
+                  <Link
+                    href="#"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Twitter / X
+                  </Link>
+                  <Link
+                    href="https://github.com/Aryan-Ghosh-Code/VeriFlow"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    GitHub
+                  </Link>
+                  <Link
+                    href="#"
+                    className="block text-sm text-white/30 hover:text-white transition-colors"
+                  >
+                    Discord
+                  </Link>
                 </div>
               </div>
             </div>
@@ -835,7 +1098,8 @@ export default function LandingPage() {
 
           <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-white/20">
-              © {new Date().getFullYear()} VeriFlow Protocol. Open Source Testnet.
+              © {new Date().getFullYear()} VeriFlow Protocol. Open Source
+              Testnet.
             </p>
             <p className="text-xs text-white/20">Built with 💜 on Ethereum</p>
           </div>
@@ -864,5 +1128,3 @@ function Sparkles(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
-
