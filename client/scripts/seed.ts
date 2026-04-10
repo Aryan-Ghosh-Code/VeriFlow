@@ -1,15 +1,4 @@
-﻿// =============================================================================
-// VeriFlow Protocol – Database Seed Script
-// =============================================================================
-// Run once to populate MongoDB Atlas with demo listings and activity events.
-//
-// Usage:
-//   npx ts-node --skip-project scripts/seed.ts
-//
-// Requires MONGODB_URI in a .env.local file in the project root.
-// =============================================================================
-
-import * as dotenv from "dotenv";
+﻿import * as dotenv from "dotenv";
 import * as path from "path";
 
 // Load .env.local
